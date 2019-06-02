@@ -71,6 +71,7 @@ blank lines as you judge appropriate within functions or methods.
 Follow standard typographic rules for the use of spaces around punctuation.
 
 No whitespace inside parentheses, brackets or braces.
+
 ```fotran
 Yes: call foo(arg1(:), arg2(:,:))
 ```
