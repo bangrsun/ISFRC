@@ -13,7 +13,10 @@ following rules when coding for this project.
 
 ## 1. 主要开发语言(Main developing language)
 
-Fortran 90 is our main developing language.
+Fortran 90 是本项目的主要开发语言。
+
+Fortran 90 is the main developing language for this project.
+
 Of course Fortran 90 cannot do everything, and it can not solve all problems 
 efficiently. So, other languages can be chosen when there is ready-made source
 code, such as the specialized math functions. These verified source code in 
@@ -34,18 +37,25 @@ languages, such as Fortran 77 and C/C++.
 Once more, we strongly suggest you can adhere to the following rules when
 coding.
 
-## 2. Fotran Style Rules
+## 2. Fortran 风格规范(Fotran Style Rules)
 
-### 2.1 Semicolons
+### 2.1 分号(Semicolons)
+
+不要在行尾加分号, 也不要用分号将两条语句放在同一行。
 
 Do not terminate your lines with semicolons, and do not use semicolons to put
 two statements on the same line.
 
-### 2.2 Line length
+### 2.2 行长度(Line length)
 
-Maximum line length is *80 characters*. Use '&' line continuation for long lines.
+每行不要超过**80个字符**。如果一行写不下，分到多行写，并用'&'符号连接。
 
-### 2.3 Parentheses
+Maximum line length is **80 characters**. Break long line into multi ones, and
+use '&' line continuation to continue them.
+
+### 2.3 括号(Parentheses)
+
+不要滥用括号。
 
 Use parentheses sparingly.
 
@@ -53,9 +63,11 @@ It is fine, though not required, to use parentheses around tuples. Do not use
 them in return statements or conditional statements unless using parentheses for
 implied line continuation or to indicate a tuple.
 
-### 2.4 Indentation
+### 2.4 缩进(Indentation)
 
-Indent your code blocks with *2 spaces*. 
+用**2个空格**来缩进代码。
+
+Indent your code blocks with **2 spaces**. 
 
 Never use tab or mix tabs and spaces. In cases of implied line continuation,
 you should align wrapped elements either vertically, or using a hanging indent 
