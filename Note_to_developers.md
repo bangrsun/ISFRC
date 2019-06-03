@@ -54,21 +54,21 @@ The main program should be placed in a separate file. Modules, if they are not
 data module, should also be placed in a separate file and named after the 
 module name.
 
-### 2.1 分号(Semicolons)
+### 2.2 分号(Semicolons)
 
 不要在行尾加分号, 也不要用分号将两条语句放在同一行。
 
 Do not terminate your lines with semicolons, and do not use semicolons to put
 two statements on the same line.
 
-### 2.2 行长度(Line length)
+### 2.3 行长度(Line length)
 
 每行不要超过**80个字符**。如果一行写不下，分到多行写，并用'&'符号连接。
 
 Maximum line length is **80 characters**. Break long line into multi ones, and
 use '&' line continuation to continue them.
 
-### 2.3 括号(Parentheses)
+### 2.4 括号(Parentheses)
 
 不要滥用括号。
 
@@ -78,7 +78,7 @@ It is fine, though not required, to use parentheses around tuples. Do not use
 them in return statements or conditional statements unless using parentheses for
 implied line continuation or to indicate a tuple.
 
-### 2.4 缩进(Indentation)
+### 2.5 缩进(Indentation)
 
 用**2个空格**来缩进代码。
 
@@ -92,7 +92,7 @@ you should align wrapped elements either vertically, or using a hanging indent
 of 2 spaces, in which case there should be nothing after the open parenthesis or
 bracket on the first line.
 
-### 2.5 空行(Blank Lines)
+### 2.6 空行(Blank Lines)
 
 顶级定义之间空两行，如module, subroutine, function等的定义。
 变量声明与子程序实体之间空一行。其余结构之间空一行，如功能明显不同的代码结构
@@ -104,9 +104,13 @@ subprogram entity. One blank line between other structures, such as code
 segments with widely different functions (you should first consider if it's
 better to separate them into different subprograms if it really happens).
 
-## 2.6 Whitespace
+## 2.7 空格(Whitespace)
+
+按照标准的排版规范来使用标点两边的空格。
 
 Follow standard typographic rules for the use of spaces around punctuation.
+
+括号内不要有空格。
 
 No whitespace inside parentheses, brackets or braces.
 
@@ -118,11 +122,15 @@ Yes: call foo(arg1(:), arg2(:,:))
 No:  call foo( arg1( : ), arg2( :, : ))
 ```
 
-No whitespace before a comma, semicolon, or colon. Do use whitespace before the
-line continuation character '&' at the end of a line.
+不要在逗号前面加空格。但是应该在行尾的行连接符'&'前面加空格。
 
-No whitespace before the open paren/bracket that starts an argument list,
-indexing or slicing.
+No whitespace before a comma. Do use whitespace before the line continuation 
+character '&' at the end of a line.
+
+在调用有参函数或变量下标时，函数名和参数之间、变量名与下标之间不要有空格。
+
+No whitespace before the open paren/bracket that starts an argument list or 
+indexing.
 
 ```fortran
 Yes: call foo(arg1(1))
@@ -160,7 +168,7 @@ No:
   long_name = 2     ! comment that should not be aligned
 ```
 
-### 2.7 Comments and Docstrings
+### 2.8 Comments and Docstrings
 
 Be sure to use the right style for module, function, method docstrings and
 inline comments.
