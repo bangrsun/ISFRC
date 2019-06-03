@@ -1,13 +1,17 @@
-# NOTE TO DEVELOPERS
+# 开发者须知(NOTE TO DEVELOPERS)
 ------
+
+首先，非常感谢你能帮助我们完善此项目。但是...，我们都知道，在一个项目的整个
+源代码中保持风格和样式的一致性对于项目代码的可读性，可维护性和可用性而言是
+非常重要的。所以，我们强烈建议你在为此项目添加代码时能遵循以下风格。
 
 Firstly, I want to say thank you very much for helping me to improve this
 project. But..., we all admit that a unified genra and style of the source code
 among the whole project is very important to the readability, maintainability
 and usability of the project. So we strongly suggest you can adhere to the 
-following rules when coding.
+following rules when coding for this project.
 
-## 1. Main developing language
+## 1. 主要开发语言(Main developing language)
 
 Fortran 90 is our main developing language.
 Of course Fortran 90 cannot do everything, and it can not solve all problems 
