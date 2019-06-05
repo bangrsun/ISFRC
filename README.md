@@ -1,7 +1,7 @@
-# GIF - The Global Instability Framework code.
+# ISFRC - The Integrated Simulation code for Field-Reversed Configuration
 
 ------
 
-GIF is a code framework for the simulation on the global instability problems in magnetic confined fusion.
+ISFRC is an integrated simulation code for the FRC design and experiment in CCF-ENN.
 
 AUTHOR: S. Y. SUN, Y. Li, and other members of simulation group in CCF-ENN.
