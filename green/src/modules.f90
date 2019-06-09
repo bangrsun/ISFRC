@@ -1,4 +1,16 @@
 !***********************************************************************
+! This file is part of project ISFRC.                                  *
+! ISFRC is an Integrated Simulation code for Field-Reversed            *
+! Configuration.                                                       *
+!                                                                      *
+! Developers:                                                          *
+! Shuying SUN, Yang LI, Huasheng XIE, ...                              *
+!                                                                      *
+! ENN Sci. & Tech. Development Coorporation, 2008-2019.                *
+! (c) All rights reserved.                                             *
+!***********************************************************************
+
+!***********************************************************************
 ! module for constants                                                 *
 !***********************************************************************
 module consta
@@ -7,280 +19,182 @@ module consta
 
   real*8,parameter :: pi = 3.1415926535897932
   real*8,parameter :: tmu = 2.0e-07
-
+  real*8,parameter :: tole = 1.0d-10
 end module consta
 
 
 !***********************************************************************
 ! module for experimental parameters                                   *
 !***********************************************************************
-module exparm
-  implicit none
-  public
-  
-  !> number of p.f. coils                                      
-  integer*4,parameter :: nfcoil = 6
-  !> number of flux loops                                      
-  integer*4,parameter :: nsilop = 41
-  !> total number of magnetic probes (magpri in EFIT)           
-  integer*4,parameter :: magpr2 = 63
-  !> number of partial rogowski loops                            
-  integer*4,parameter :: nrogow = 1
-  !> number of ohmic heating coils                             
-  integer*4,parameter :: necoil = 1
-  !> number of o.h. coil groups                                
-  integer*4,parameter :: nesum = 1
-  !> number of p.f. coil groups                                
-  integer*4,parameter :: nfsum = 6
-  !> number of vessel segement groups                          
-  integer*4,parameter :: nvsum = 24
-  !> number of vessel segements     
-  integer*4,parameter :: nvesel = 24
-  !> number of advance divertor coils                          
-  integer*4,parameter :: nacoil = 1
-  integer*4,parameter :: mgaus1 = 8
-  integer*4,parameter :: mgaus2 = 10
-  integer*4 :: nw,nh,nwnh
-end module exparm
-
-
-!***********************************************************************
-! module for input                                                     *
-!***********************************************************************
-module input
+module exparam
   implicit none
   public
 
-  !> flag for shapping coil calculation, =1 enabled, =0 disabled
-  integer*4 :: ifcoil
-  integer*4 :: islpfc
-  !> flag for Ohmic coil calculation, =1 enabled, =0 disabled
-  integer*4 :: iecoil
-  integer*4 :: isize
-  !> flag for vessel calculation, =1 enabled, =0 disabled
-  integer*4 :: ivesel
+!> grids and active coil settings --------------------------------------
+  !> flag for define grids, =0 uniform, =1 customed
   integer*4 :: igrid
-  real*8    :: rleft,rright,zbotto,ztop
+  !> number of grids in R direction
+  integer*4 :: nrgrid
+  !> number of grids in Z direction
+  integer*4 :: nzgrid
+  !> border of calculation box, 
+  !  must be defined if igrid=0, no meaning if igrid=1
+  real*8 :: rmin,rmax,zmin,zmax
+  !> number of p.f. coils, <=0 disabled, >0 enabled
+  integer*4 :: nfcoil
+  !> number of vessel segments, <=0 disabled, >0 enabled
+  integer*4 :: nvesel
+  !> number of Ohmic heating coils, <=0 disabled, >0 enabled
+  integer*4 :: necoil
+  !> number of advance divertor coils, <=0 disabled, >0 enabled
+  integer*4 :: nacoil
+!> diagnostic device settings ------------------------------------------
+  !> number of flux loops
+  integer*4 :: nfldiag
+  !> total number of magnetic probes
+  integer*4 :: nmpdiag
+  !> number of partial rogowski loops
+  integer*4 :: nrogdiag
 
-end module input
+  namelist/expset/ igrid,nrgrid,nzgrid,rmin,rmax,zmin,zmax &
+    ,nfcoil,nvesel,necoil,nacoil &
+    ,nfldiag,nmpdiag,nrogdiag
 
-
-!***********************************************************************
-! module for bfgrid                                                    *
-!***********************************************************************
-module bfgrid
-  implicit none
-  public
-
-  real*8,dimension(:,:),allocatable,save :: brgridfc,bzgridfc
-
-end module bfgrid
-
-
-!***********************************************************************
-! module for poloidal field coil                                       *
-!***********************************************************************
-module fcoil
-  use exparm,only:nfcoil
-  implicit none
-  public
-
-  real*8,dimension(nfcoil) :: rf
-  real*8,dimension(nfcoil) :: zf
-  real*8,dimension(nfcoil) :: wf
-  real*8,dimension(nfcoil) :: hf
-  real*8,dimension(nfcoil) :: af
-  real*8,dimension(nfcoil) :: af2
-  real*8,dimension(nfcoil) :: turnfc
-  real*8,dimension(nfcoil) :: fcid
-  real*8,dimension(nfcoil) :: fcturn
-
-end module fcoil
+end module exparam
 
 
 !***********************************************************************
-! module for advanced divertor coil                                    *
-!***********************************************************************
-module cacoil
-  use exparm,only: nacoil
-  implicit none
-  public
-
-  !> flag for advance divertor coil calculation, =1 enabled, =0 disabled
-  integer*4 :: iacoil
-  !> R coordinate of advanced divertor coils
-  real*8,dimension(nacoil) :: racoil
-  !> Z coordinate of advanced divertor coils
-  real*8,dimension(nacoil) :: zacoil
-  !> width of advanced divertor coils
-  real*8,dimension(nacoil) :: wacoil
-  !> height of advanced divertor coils
-  real*8,dimension(nacoil) :: hacoil
-
-end module cacoil
-
-
-!***********************************************************************
-! module for Ohmic heating coil                                        *
-!***********************************************************************
-module cecoil
-  use exparm,only:necoil
-  implicit none
-  public
-
-  !> R coordinate of Ohmic heating coils
-  real*8,dimension(necoil):: re
-  !> Z coordinate of Ohmic heating coils
-  real*8,dimension(necoil):: ze
-  !> width of Ohmic heating coils
-  real*8,dimension(necoil):: we
-  !> height of Ohmic heating coils
-  real*8,dimension(necoil):: he
-  real*8,dimension(necoil):: ecid
-  real*8,dimension(necoil):: ecturn
-
-end module cecoil
-
-
-!***********************************************************************
-! module for coilsp                                                    *
-!***********************************************************************
-module coilsp
-  implicit none
-  public
-  real*8,dimension(300) :: rsplt,zsplt,csplt
-
-end module coilsp
-
-
-!***********************************************************************
-! module for cvesel                                                    *
-!***********************************************************************
-module cvesel
-  use exparm,only:nvesel
-  implicit none
-  public
-
-  real*8,dimension(nvesel) :: rvs,zvs,wvs,hvs,avs,avs2,&
-                            rsisvs,vsid
-
-end module cvesel
-
-
-!***********************************************************************
-! module for var_filech                                                *
-!***********************************************************************
-module var_filech
-        
-  character*4 :: ch1, ch2
-        
-end module var_filech
-
-
-!***********************************************************************
-! module for fshift                                                    *
-!***********************************************************************
-module fshift
-  use exparm,only:nfcoil,magpr2
-  implicit none
-  public
-
-  integer*4,dimension(nfcoil) :: nshiftrz
-  real*8,dimension(nfcoil) :: rshift,zshift,pshift
-  real*8,dimension(magpr2) :: pmprobe
-
-end module fshift
-
-
-!***********************************************************************
-! module for nio                                                       *
+! module for input and output file unit                                *
 !***********************************************************************
 module nio
   implicit none
   public
 
-  !> file unit of input file
-  integer*4,parameter :: nin = 11
-  !> file unit of output file
-  integer*4,parameter :: nout = 10
-  !> file unit for command window
-  integer*4,parameter :: ntty = 5
-  integer*4,parameter :: nrsppc = 25
-  integer*4,parameter :: nrspfc = 26
-  integer*4,parameter :: ncontr = 35
+  !> expset namelist are defined in this file
+  integer*4,parameter :: fu_input = 100
+  !> rgrid & zgrid are defined in this file
+  integer*4,parameter :: fu_grid = 101
+  !> expset namelist are outputed in this file
+  integer*4,parameter :: fu_output = 200
+  !> green functions are outputed in this file
+  integer*4,parameter :: fu_gfunc = 201
+  !> response functions are outputed in this file
+  integer*4,parameter :: fu_rfunc = 202
 
 end module nio
 
 
 !***********************************************************************
-! module for pmodel                                                    *
+! module for domain                                                    *
 !***********************************************************************
-module pmodel
+module domain
   implicit none
   public
 
-  real*8,dimension(:),allocatable,save :: rgrid
-  real*8,dimension(:),allocatable,save :: zgrid
-  real*8 :: dr,dz
+  !> R coordinate of grid points, must be defined if igrid=1
+  real*8,dimension(:,:),allocatable :: rgrid_rz
+  !> Z coordinate of grid points, must be defined if igrid=1
+  real*8,dimension(:,:),allocatable :: zgrid_rz
+  !> Green's function by plasma itself
+  real*8,dimension(:,:,:,:),allocatable :: gfplas_rzrz
 
-end module pmodel
+end module domain
+
+!***********************************************************************
+! module for poloidal field coil                                       *
+!***********************************************************************
+module fcoil
+  implicit none
+  !> R coordinate of poloidal field coil
+  real*8,dimension(:),allocatable :: r_f
+  !> Z coordinate of poloidal field coil
+  real*8,dimension(:),allocatable :: z_f
+  !> width of poloidal field coil
+  real*8,dimension(:),allocatable :: w_f
+  !> height of poloidal field coil
+  real*8,dimension(:),allocatable :: h_f
+  !> angle to R direction
+  real*8,dimension(:),allocatable :: ar_f
+  !> angle to Z direction
+  real*8,dimension(:),allocatable :: az_f
+  !> splits in R direction
+  integer*4,dimension(:),allocatable :: nsr_f
+  !> splits in Z direction
+  integer*4,dimension(:),allocatable :: nsz_f
+  !> Green's function for p.f. coils
+  real*8,dimension(:,:,:),allocatable :: gffcoil_rzf
+
+  namelist/fcoilset/ r_f,z_f,w_f,h_f,ar_f,az_f,nsr_f,nsz_f
+
+end module fcoil
 
 
 !***********************************************************************
-! module for magnetic probe diagnostics                                *
+! module for vessel                                                    *
 !***********************************************************************
-module mprobe
-  use exparm,only:magpr2
+module vesel
   implicit none
   public
 
-  !> R coordinate of magnetic probe in meter
-  real*8,dimension(magpr2) :: xmp2
-  !> Z coordinate of magnetic probe in meter
-  real*8,dimension(magpr2) :: ymp2
-  !> angle of magnetic probe in degree
-  real*8,dimension(magpr2) :: amp2
-  !> length of magnetic probe in meter
-  real*8,dimension(magpr2) :: smp2
-  integer*4 :: nsmp2
+  !> R coordinate of vessel segments
+  real*8,dimension(:),allocatable :: r_v
+  !> Z coordinate of vessel segments
+  real*8,dimension(:),allocatable :: z_v
+  !> width of vessel segments
+  real*8,dimension(:),allocatable :: w_v
+  !> height of vessel segments
+  real*8,dimension(:),allocatable :: h_v
+  !> angle to R direction
+  real*8,dimension(:),allocatable :: ar_v
+  !> angle to Z direction
+  real*8,dimension(:),allocatable :: az_v
+  !> Green's function for p.f. coils
+  real*8,dimension(:,:,:),allocatable :: gfvesel_rzv
 
-end module mprobe
+  namelist/veselset/ r_v,z_v,w_v,h_v,ar_v,az_v
+
+end module vesel
 
 
 !***********************************************************************
-! module for flux loop diagnostics                                     *
+! module for Ohmic heating coil                                        *
 !***********************************************************************
-module siloop
-  use exparm,only:nsilop
+module ecoil
   implicit none
   public
 
-  !> R coordinate of flux loop diagnostics
-  real*8,dimension(nsilop) :: rsi
-  !> Z coordinate of flux loop diagnostics
-  real*8,dimension(nsilop) :: zsi
-  !> width of flux loop diagnostics
-  real*8,dimension(nsilop) :: wsi
-  !> height of flux loop diagnostics
-  real*8,dimension(nsilop) :: hsi
-  real*8,dimension(nsilop) :: as
-  real*8,dimension(nsilop) :: as2
+  !> R coordinate of Ohmic heating coils
+  real*8,dimension(:),allocatable :: r_e
+  !> Z coordinate of Ohmic heating coils
+  real*8,dimension(:),allocatable :: z_e
+  !> width of Ohmic heating coils
+  real*8,dimension(:),allocatable :: w_e
+  !> height of Ohmic heating coils
+  real*8,dimension(:),allocatable :: h_e
 
-end module siloop
+  namelist/ecoilset/ r_e,z_e,w_e,h_e
+
+end module ecoil
 
 
 !***********************************************************************
-! module for Rogowski coil diagnostics                                 *
+! module for advanced divertor coil                                    *
 !***********************************************************************
-module rogowl
-  use exparm,only:nrogow
+module acoil
   implicit none
   public
 
-  integer*4,dimension(nrogow) :: narc
-  real*8,dimension(nrogow) :: prname
-  real*8,dimension(36) :: rp,zp
-  real*8,dimension(101) :: rpg,zpg
+  !> R coordinate of advanced divertor coils
+  real*8,dimension(:),allocatable :: r_a
+  !> Z coordinate of advanced divertor coils
+  real*8,dimension(:),allocatable :: z_a
+  !> width of advanced divertor coils
+  real*8,dimension(:),allocatable :: w_a
+  !> height of advanced divertor coils
+  real*8,dimension(:),allocatable :: h_a
 
-end module rogowl
+  namelist/acoilset/ r_a,z_a,w_a,h_a
+
+end module acoil
+
 
