@@ -13,20 +13,58 @@
 !***********************************************************************
 ! subprogram description:                                              *
 !      calc_gf calculate the Green's function of all active coils,     *
-!      including the fcoil, plasma, vessel, acoil, ecoil.              *
+!      including the fcoil, vessel, acoil, ecoil. This subroutine      *
+!      does not calculate the Green's function from plasma itself.     *
 !                                                                      *
 ! calling arguments:                                                   *
 !                                                                      *
 !***********************************************************************
 subroutine calcgfunc
-  use exparam,only:nrgrid,nzgrid,nfcoil,nvesel
+  use exparam,only:nrgrid,nzgrid,nvesel,nfcoil,nacoil,necoil
   use domain
-  use fcoil
   use vesel
+  use fcoil
+  use acoil
+  use ecoil
   implicit none
-  integer i,j
   real*8,dimension(nrgrid,nzgrid) :: gftmp
+  real*8,external :: mutpsi
+  integer i,j,jg,ig
 
+!----------------------------------------------------------------------
+!-- calculate Green's function of plasma itself                      --
+!----------------------------------------------------------------------
+!  do jg=1,nzgrid
+!    do ig=1,nrgrid
+!      if(rgrid_rz(ig,jg) <=0.0d0) then
+!        gfplas_rzrz(:,:,ig,jg)=0.0d0
+!      else
+!        do j=1,nzgrid
+!          do i=1,nrgrid
+!            if(i==ig .and. j==jg) then
+!              gfplas_rzrz(i,j,ig,jg)=0.0d0
+!            else
+!              gfplas_rzrz(i,j,ig,jg)=mutpsi(rgrid_rz(ig,jg), &
+!                rgrid_rz(i,j),zgrid_rz(i,j)-zgrid_rz(ig,jg))
+!            endif
+!          enddo
+!        enddo
+!      endif
+!    enddo
+!  enddo
+!----------------------------------------------------------------------
+!-- calculate Green's function of vessel                             --
+!----------------------------------------------------------------------
+  if(nvesel > 0) then
+    do i=1,nvesel
+      call greenfunc(r_v(i),z_v(i),w_v(i),h_v(i),ar_v(i),az_v(i), &
+        1,1,nrgrid,nzgrid,rgrid_rz,zgrid_rz,gftmp)
+      gfvesel_rzv(:,:,i)=gftmp
+    enddo
+  endif
+!----------------------------------------------------------------------
+!-- calculate Green's function of fcoil                              --
+!----------------------------------------------------------------------
   if(nfcoil > 0) then
     do i=1,nfcoil
       call greenfunc(r_f(i),z_f(i),w_f(i),h_f(i),ar_f(i),az_f(i), &
@@ -34,11 +72,24 @@ subroutine calcgfunc
       gffcoil_rzf(:,:,i)=gftmp
     enddo
   endif
-  if(nvesel > 0) then
-    do i=1,nvesel
-      call greenfunc(r_v(i),z_v(i),w_v(i),h_v(i),ar_v(i),az_v(i), &
-        1,1,nrgrid,nzgrid,rgrid_rz,zgrid_rz,gftmp)
-      gfvesel_rzv(:,:,i)=gftmp
+!----------------------------------------------------------------------
+!-- calculate Green's function of acoil                              --
+!----------------------------------------------------------------------
+  if(nacoil > 0) then
+    do i=1,nacoil
+      call greenfunc(r_f(i),z_f(i),w_f(i),h_f(i),ar_f(i),az_f(i), &
+        nsr_f(i),nsz_f(i),nrgrid,nzgrid,rgrid_rz,zgrid_rz,gftmp)
+      gfacoil_rza(:,:,i)=gftmp
+    enddo
+  endif
+!----------------------------------------------------------------------
+!-- calculate Green's function of ecoil                              --
+!----------------------------------------------------------------------
+  if(necoil > 0) then
+    do i=1,necoil
+      call greenfunc(r_f(i),z_f(i),w_f(i),h_f(i),ar_f(i),az_f(i), &
+        nsr_f(i),nsz_f(i),nrgrid,nzgrid,rgrid_rz,zgrid_rz,gftmp)
+      gfecoil_rze(:,:,i)=gftmp
     enddo
   endif
  

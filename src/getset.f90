@@ -21,10 +21,10 @@ subroutine getset
   use exparam
   use nio
   use domain
-  use fcoil
   use vesel
-  !use ecoil
-  !use acoil
+  use fcoil
+  use acoil
+  use ecoil
   !use fldiag
   !use mpdiag
   !use rogdiag
@@ -47,6 +47,22 @@ subroutine getset
     write(*,*) "Wrong grid settings for nrgrid and nzgrid !!!"
     stop
   endif
+  !-- if vesel enabled ------------------------------------------------
+  if(nvesel > 0) then
+    allocate(r_v(nvesel),z_v(nvesel),w_v(nvesel),h_v(nvesel), &
+      ar_v(nvesel),az_v(nvesel))
+    allocate(gfvesel_rzv(nrgrid,nzgrid,nvesel))
+    r_v=0.0d0
+    z_v=0.0d0
+    w_v=0.0d0
+    h_v=0.0d0
+    ar_v=0.0d0
+    az_v=0.0d0
+    read(fu_input,nml=veselset)
+    if(w_v(nvesel) == 0.0d0 .or. h_v(nvesel) == 0.0d0) then
+      write(*,*) "Waring: length of vesel segments coordinate < nfcoil !"
+    endif
+  endif
   !-- if fcoil enabled ------------------------------------------------
   if(nfcoil > 0) then
     allocate(r_f(nfcoil),z_f(nfcoil),w_f(nfcoil),h_f(nfcoil), &
@@ -61,26 +77,16 @@ subroutine getset
     nsr_f=1
     nsz_f=1
     read(fu_input,nml=fcoilset)
-  endif
-  !-- if vesel enabled ------------------------------------------------
-  if(nvesel > 0) then
-    allocate(r_v(nvesel),z_v(nvesel),w_v(nvesel),h_v(nvesel), &
-      ar_v(nvesel),az_v(nvesel))
-    allocate(gfvesel_rzv(nrgrid,nzgrid,nvesel))
-    r_v=0.0d0
-    z_v=0.0d0
-    w_v=0.0d0
-    h_v=0.0d0
-    ar_v=0.0d0
-    az_v=0.0d0
-    read(fu_input,nml=veselset)
-  endif
-  !-- if ecoil enabled ------------------------------------------------
-  if(necoil > 0) then
-
+    if(w_f(nfcoil) == 0.0d0 .or. h_f(nfcoil) == 0.0d0) then
+      write(*,*) "Waring: length of fcoil coordinate < nfcoil !"
+    endif
   endif
   !-- if acoil enabled ------------------------------------------------
   if(nacoil > 0) then
+
+  endif
+  !-- if ecoil enabled ------------------------------------------------
+  if(necoil > 0) then
 
   endif
   !-- if fldiag enabled -----------------------------------------------

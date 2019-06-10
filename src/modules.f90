@@ -40,14 +40,14 @@ module exparam
   !> border of calculation box, 
   !  must be defined if igrid=0, no meaning if igrid=1
   real*8 :: rmin,rmax,zmin,zmax
-  !> number of p.f. coils, <=0 disabled, >0 enabled
-  integer*4 :: nfcoil
   !> number of vessel segments, <=0 disabled, >0 enabled
   integer*4 :: nvesel
-  !> number of Ohmic heating coils, <=0 disabled, >0 enabled
-  integer*4 :: necoil
+  !> number of p.f. coils, <=0 disabled, >0 enabled
+  integer*4 :: nfcoil
   !> number of advance divertor coils, <=0 disabled, >0 enabled
   integer*4 :: nacoil
+  !> number of Ohmic heating coils, <=0 disabled, >0 enabled
+  integer*4 :: necoil
 !> diagnostic device settings ------------------------------------------
   !> number of flux loops
   integer*4 :: nfldiag
@@ -100,6 +100,34 @@ module domain
 
 end module domain
 
+
+!***********************************************************************
+! module for vessel                                                    *
+!***********************************************************************
+module vesel
+  implicit none
+  public
+
+  !> R coordinate of vessel segments
+  real*8,dimension(:),allocatable :: r_v
+  !> Z coordinate of vessel segments
+  real*8,dimension(:),allocatable :: z_v
+  !> width of vessel segments
+  real*8,dimension(:),allocatable :: w_v
+  !> height of vessel segments
+  real*8,dimension(:),allocatable :: h_v
+  !> angle to R direction
+  real*8,dimension(:),allocatable :: ar_v
+  !> angle to Z direction
+  real*8,dimension(:),allocatable :: az_v
+  !> Green's function for p.f. coils
+  real*8,dimension(:,:,:),allocatable :: gfvesel_rzv
+
+  namelist/veselset/ r_v,z_v,w_v,h_v,ar_v,az_v
+
+end module vesel
+
+
 !***********************************************************************
 ! module for poloidal field coil                                       *
 !***********************************************************************
@@ -130,30 +158,34 @@ end module fcoil
 
 
 !***********************************************************************
-! module for vessel                                                    *
+! module for advanced divertor coil                                    *
 !***********************************************************************
-module vesel
+module acoil
   implicit none
   public
 
-  !> R coordinate of vessel segments
-  real*8,dimension(:),allocatable :: r_v
-  !> Z coordinate of vessel segments
-  real*8,dimension(:),allocatable :: z_v
-  !> width of vessel segments
-  real*8,dimension(:),allocatable :: w_v
-  !> height of vessel segments
-  real*8,dimension(:),allocatable :: h_v
+  !> R coordinate of advanced divertor coils
+  real*8,dimension(:),allocatable :: r_a
+  !> Z coordinate of advanced divertor coils
+  real*8,dimension(:),allocatable :: z_a
+  !> width of advanced divertor coils
+  real*8,dimension(:),allocatable :: w_a
+  !> height of advanced divertor coils
+  real*8,dimension(:),allocatable :: h_a
   !> angle to R direction
-  real*8,dimension(:),allocatable :: ar_v
+  real*8,dimension(:),allocatable :: ar_a
   !> angle to Z direction
-  real*8,dimension(:),allocatable :: az_v
+  real*8,dimension(:),allocatable :: az_a
+  !> splits in R direction
+  integer*4,dimension(:),allocatable :: nsr_a
+  !> splits in Z direction
+  integer*4,dimension(:),allocatable :: nsz_a
   !> Green's function for p.f. coils
-  real*8,dimension(:,:,:),allocatable :: gfvesel_rzv
+  real*8,dimension(:,:,:),allocatable :: gfacoil_rza
 
-  namelist/veselset/ r_v,z_v,w_v,h_v,ar_v,az_v
+  namelist/acoilset/ r_a,z_a,w_a,h_a,ar_a,az_a,nsr_a,nsz_a
 
-end module vesel
+end module acoil
 
 
 !***********************************************************************
@@ -171,30 +203,19 @@ module ecoil
   real*8,dimension(:),allocatable :: w_e
   !> height of Ohmic heating coils
   real*8,dimension(:),allocatable :: h_e
+  !> angle to R direction
+  real*8,dimension(:),allocatable :: ar_e
+  !> angle to Z direction
+  real*8,dimension(:),allocatable :: az_e
+  !> splits in R direction
+  integer*4,dimension(:),allocatable :: nsr_e
+  !> splits in Z direction
+  integer*4,dimension(:),allocatable :: nsz_e
+  !> Green's function for p.f. coils
+  real*8,dimension(:,:,:),allocatable :: gfecoil_rze
 
-  namelist/ecoilset/ r_e,z_e,w_e,h_e
+  namelist/ecoilset/ r_e,z_e,w_e,h_e,ar_e,az_e,nsr_e,nsz_e
 
 end module ecoil
-
-
-!***********************************************************************
-! module for advanced divertor coil                                    *
-!***********************************************************************
-module acoil
-  implicit none
-  public
-
-  !> R coordinate of advanced divertor coils
-  real*8,dimension(:),allocatable :: r_a
-  !> Z coordinate of advanced divertor coils
-  real*8,dimension(:),allocatable :: z_a
-  !> width of advanced divertor coils
-  real*8,dimension(:),allocatable :: w_a
-  !> height of advanced divertor coils
-  real*8,dimension(:),allocatable :: h_a
-
-  namelist/acoilset/ r_a,z_a,w_a,h_a
-
-end module acoil
 
 

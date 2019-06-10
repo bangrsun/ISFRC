@@ -20,10 +20,11 @@
 subroutine writegfunc
   use exparam
   use nio
-  use fcoil
+  use domain
   use vesel
-  !use ecoil
-  !use acoil
+  use fcoil
+  use acoil
+  use ecoil
   !use fldiag
   !use mpdiag
   !use rogdiag
@@ -33,11 +34,17 @@ subroutine writegfunc
   real*8 dr,dz
 
   open(unit=fu_gfunc,status='unknown',file='gfunc.dat')
+  if(nvesel > 0) then
+    write(fu_gfunc,*) gfvesel_rzv
+  endif
   if(nfcoil > 0) then
     write(fu_gfunc,*) gffcoil_rzf
   endif
-  if(nvesel > 0) then
-    write(fu_gfunc,*) gfvesel_rzv
+  if(nacoil > 0) then
+    write(fu_gfunc,*) gfacoil_rza
+  endif
+  if(necoil > 0) then
+    write(fu_gfunc,*) gfecoil_rze
   endif
 
   flush(fu_gfunc)

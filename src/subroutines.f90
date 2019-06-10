@@ -81,21 +81,20 @@ real*8 function mutpsi(a1,r1,z1)
   use consta,only:tole
   implicit none
   real*8,intent(in) :: a1,r1,z1
-  real*8 :: a,r,z,tmp1,tmp2,xk,x1,cay,ee
+  real*8 :: a,r,z,tmp1,tmp2,xk,cay,ee
   real*8,external :: dellipk,dellipe
 
   a=a1
   r=r1
   z=z1
   tmp1=(a+r)*(a+r)+z*z
-  tmp2=(a-r)*(a-r)+z*z
+  !tmp2=(a-r)*(a-r)+z*z
   xk=4.0d0*a*r/tmp1
-  x1=tmp2/tmp1
-  if(x1 < 1.0d-10) x1=1.0d-10
-  cay=dellipk(x1)
-  ee=dellipe(x1)
+  if(xk < tole) xk=tole
+  cay=dellipk(xk)
+  ee=dellipe(xk)
 
-  mutpsi=dsqrt(tmp1)*((1.0d0-0.5d0*xk)*cay-ee)
+  mutpsi=dsqrt(a*r)*((0.5d0*xk-1.0d0)*cay+ee)/dsqrt(xk)
   return
 end function mutpsi
 
