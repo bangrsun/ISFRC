@@ -19,8 +19,8 @@ ifeq ($(MACHINE),Linux)
   LIB =
 endif
 
-SOURCES = modules.f90 subroutines.f90 main.f90 getset.f90 calcgfunc.f90 \
-					writegfunc.f90
+SOURCES = modules.f90 elliptic.f90 subroutines.f90 \
+					main.f90 getset.f90 calcgfunc.f90 writegfunc.f90
 
 OBJECTS=$(SOURCES:.f90=.o)
 
@@ -29,12 +29,15 @@ gfun:$(OBJECTS)
 	cp $@ $(RUN_DIR)
 	@echo "GFUN BUILT"
 
-%.o:%.f90
-	$(FC) $(FFLAGS) -c $< $(LIB)
-
 $(filter-out modules.o,$(OBJECTS)):modules.o
 
 main.o: main.f90 subroutines.o getset.o calcgfunc.o writegfunc.o
+	$(FC) $(FFLAGS) -c $< $(LIB)
+
+subroutines.o:subroutines.f90 elliptic.o
+	$(FC) $(FFLAGS) -c $< $(LIB)
+
+%.o:%.f90
 	$(FC) $(FFLAGS) -c $< $(LIB)
 
 #modules.o: modules.f90
