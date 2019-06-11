@@ -44,21 +44,9 @@ module exparam
   integer*4 :: nvesel
   !> number of p.f. coils, <=0 disabled, >0 enabled
   integer*4 :: nfcoil
-  !> number of advance divertor coils, <=0 disabled, >0 enabled
-  integer*4 :: nacoil
-  !> number of Ohmic heating coils, <=0 disabled, >0 enabled
-  integer*4 :: necoil
-!> diagnostic device settings ------------------------------------------
-  !> number of flux loops
-  integer*4 :: nfldiag
-  !> total number of magnetic probes
-  integer*4 :: nmpdiag
-  !> number of partial rogowski loops
-  integer*4 :: nrogdiag
 
   namelist/expset/ igrid,nrgrid,nzgrid,rmin,rmax,zmin,zmax &
-    ,nfcoil,nvesel,necoil,nacoil &
-    ,nfldiag,nmpdiag,nrogdiag
+    ,nvesel,nfcoil
 
 end module exparam
 
@@ -95,7 +83,7 @@ module domain
   real*8,dimension(:,:),allocatable :: rgrid_rz
   !> Z coordinate of grid points, must be defined if igrid=1
   real*8,dimension(:,:),allocatable :: zgrid_rz
-  !> Green's function by plasma itself
+  !> Green's function for plasma itself
   real*8,dimension(:,:,:,:),allocatable :: gfplas_rzrz
 
 end module domain
@@ -155,67 +143,5 @@ module fcoil
   namelist/fcoilset/ r_f,z_f,w_f,h_f,ar_f,az_f,nsr_f,nsz_f
 
 end module fcoil
-
-
-!***********************************************************************
-! module for advanced divertor coil                                    *
-!***********************************************************************
-module acoil
-  implicit none
-  public
-
-  !> R coordinate of advanced divertor coils
-  real*8,dimension(:),allocatable :: r_a
-  !> Z coordinate of advanced divertor coils
-  real*8,dimension(:),allocatable :: z_a
-  !> width of advanced divertor coils
-  real*8,dimension(:),allocatable :: w_a
-  !> height of advanced divertor coils
-  real*8,dimension(:),allocatable :: h_a
-  !> angle to R direction
-  real*8,dimension(:),allocatable :: ar_a
-  !> angle to Z direction
-  real*8,dimension(:),allocatable :: az_a
-  !> splits in R direction
-  integer*4,dimension(:),allocatable :: nsr_a
-  !> splits in Z direction
-  integer*4,dimension(:),allocatable :: nsz_a
-  !> Green's function for p.f. coils
-  real*8,dimension(:,:,:),allocatable :: gfacoil_rza
-
-  namelist/acoilset/ r_a,z_a,w_a,h_a,ar_a,az_a,nsr_a,nsz_a
-
-end module acoil
-
-
-!***********************************************************************
-! module for Ohmic heating coil                                        *
-!***********************************************************************
-module ecoil
-  implicit none
-  public
-
-  !> R coordinate of Ohmic heating coils
-  real*8,dimension(:),allocatable :: r_e
-  !> Z coordinate of Ohmic heating coils
-  real*8,dimension(:),allocatable :: z_e
-  !> width of Ohmic heating coils
-  real*8,dimension(:),allocatable :: w_e
-  !> height of Ohmic heating coils
-  real*8,dimension(:),allocatable :: h_e
-  !> angle to R direction
-  real*8,dimension(:),allocatable :: ar_e
-  !> angle to Z direction
-  real*8,dimension(:),allocatable :: az_e
-  !> splits in R direction
-  integer*4,dimension(:),allocatable :: nsr_e
-  !> splits in Z direction
-  integer*4,dimension(:),allocatable :: nsz_e
-  !> Green's function for p.f. coils
-  real*8,dimension(:,:,:),allocatable :: gfecoil_rze
-
-  namelist/ecoilset/ r_e,z_e,w_e,h_e,ar_e,az_e,nsr_e,nsz_e
-
-end module ecoil
 
 
