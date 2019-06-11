@@ -12,22 +12,17 @@
 
 !***********************************************************************
 ! subprogram description:                                              *
-!      getset performs inputing and initialization.                    *
+!      setup performs inputing and initialization.                     *
 !                                                                      *
 ! calling arguments:                                                   *
 !                                                                      *
 !***********************************************************************
-subroutine getset
+subroutine setup
   use exparam
   use nio
   use domain
   use vesel
   use fcoil
-  use acoil
-  use ecoil
-  !use fldiag
-  !use mpdiag
-  !use rogdiag
   implicit none
   logical file_exist
   integer i,j
@@ -58,6 +53,7 @@ subroutine getset
     h_v=0.0d0
     ar_v=0.0d0
     az_v=0.0d0
+    gfvesel_rzv=0.0d0
     read(fu_input,nml=veselset)
     if(w_v(nvesel) == 0.0d0 .or. h_v(nvesel) == 0.0d0) then
       write(*,*) "Waring: length of vesel segments coordinate < nfcoil !"
@@ -76,32 +72,12 @@ subroutine getset
     az_f=0.0d0
     nsr_f=1
     nsz_f=1
+    gffcoil_rzf=0.0d0
     read(fu_input,nml=fcoilset)
     if(w_f(nfcoil) == 0.0d0 .or. h_f(nfcoil) == 0.0d0) then
       write(*,*) "Waring: length of fcoil coordinate < nfcoil !"
     endif
   endif
-  !-- if acoil enabled ------------------------------------------------
-  if(nacoil > 0) then
-
-  endif
-  !-- if ecoil enabled ------------------------------------------------
-  if(necoil > 0) then
-
-  endif
-  !-- if fldiag enabled -----------------------------------------------
-  if(nfldiag > 0) then
-
-  endif
-  !-- if mpdiag enabled -----------------------------------------------
-  if(nmpdiag > 0) then
-
-  endif
-  !-- if rogdiag enabled ----------------------------------------------
-  if(nrogdiag > 0) then
-
-  endif
-
   close(fu_input)
 !----------------------------------------------------------------------
 !-- read grid parameters or make grid meshes                         --
@@ -110,6 +86,7 @@ subroutine getset
   allocate(gfplas_rzrz(nrgrid,nzgrid,nrgrid,nzgrid))
   rgrid_rz=0.0d0
   zgrid_rz=0.0d0
+  gfplas_rzrz=0.0d0
   if(igrid == 0) then
     dr=(rmax-rmin)/float(nrgrid-1)
     dz=(zmax-zmin)/float(nzgrid-1)
@@ -136,5 +113,5 @@ subroutine getset
   endif
 
   return
-end subroutine getset
+end subroutine setup
 

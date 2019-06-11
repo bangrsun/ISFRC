@@ -20,12 +20,11 @@
 !                                                                      *
 !***********************************************************************
 subroutine calcgfunc
-  use exparam,only:nrgrid,nzgrid,nvesel,nfcoil,nacoil,necoil
+  use consta,only:tmu
+  use exparam
   use domain
   use vesel
   use fcoil
-  use acoil
-  use ecoil
   implicit none
   real*8,dimension(nrgrid,nzgrid) :: gftmp
   real*8,external :: mutpsi
@@ -34,24 +33,20 @@ subroutine calcgfunc
 !----------------------------------------------------------------------
 !-- calculate Green's function of plasma itself                      --
 !----------------------------------------------------------------------
-!  do jg=1,nzgrid
-!    do ig=1,nrgrid
-!      if(rgrid_rz(ig,jg) <=0.0d0) then
-!        gfplas_rzrz(:,:,ig,jg)=0.0d0
-!      else
-!        do j=1,nzgrid
-!          do i=1,nrgrid
-!            if(i==ig .and. j==jg) then
-!              gfplas_rzrz(i,j,ig,jg)=0.0d0
-!            else
-!              gfplas_rzrz(i,j,ig,jg)=mutpsi(rgrid_rz(ig,jg), &
-!                rgrid_rz(i,j),zgrid_rz(i,j)-zgrid_rz(ig,jg))
-!            endif
-!          enddo
-!        enddo
-!      endif
-!    enddo
-!  enddo
+  do jg=1,nzgrid
+    do ig=1,nrgrid
+      if(rgrid_rz(ig,jg) <=0.0d0) then
+        gfplas_rzrz(:,:,ig,jg)=0.0d0
+      else
+        do j=1,nzgrid
+          do i=1,nrgrid
+            gfplas_rzrz(i,j,ig,jg)=mutpsi(rgrid_rz(ig,jg), &
+              rgrid_rz(i,j),zgrid_rz(i,j)-zgrid_rz(ig,jg))*tmu
+          enddo
+        enddo
+      endif
+    enddo
+  enddo
 !----------------------------------------------------------------------
 !-- calculate Green's function of vessel                             --
 !----------------------------------------------------------------------
@@ -72,26 +67,6 @@ subroutine calcgfunc
       gffcoil_rzf(:,:,i)=gftmp
     enddo
   endif
-!----------------------------------------------------------------------
-!-- calculate Green's function of acoil                              --
-!----------------------------------------------------------------------
-  if(nacoil > 0) then
-    do i=1,nacoil
-      call greenfunc(r_f(i),z_f(i),w_f(i),h_f(i),ar_f(i),az_f(i), &
-        nsr_f(i),nsz_f(i),nrgrid,nzgrid,rgrid_rz,zgrid_rz,gftmp)
-      gfacoil_rza(:,:,i)=gftmp
-    enddo
-  endif
-!----------------------------------------------------------------------
-!-- calculate Green's function of ecoil                              --
-!----------------------------------------------------------------------
-  if(necoil > 0) then
-    do i=1,necoil
-      call greenfunc(r_f(i),z_f(i),w_f(i),h_f(i),ar_f(i),az_f(i), &
-        nsr_f(i),nsz_f(i),nrgrid,nzgrid,rgrid_rz,zgrid_rz,gftmp)
-      gfecoil_rze(:,:,i)=gftmp
-    enddo
-  endif
  
   return
 end subroutine calcgfunc
@@ -104,6 +79,7 @@ end subroutine calcgfunc
 !***********************************************************************
 subroutine greenfunc(rc,zc,wc,hc,acr,acz,nsr,nsz, &
     ngr,ngz,rgrid_rz,zgrid_rz,gfgrid_rz)
+  use consta,only:tmu
   implicit none
   !> R & Z coordinate of current loop
   real*8,intent(in) :: rc,zc
@@ -138,7 +114,7 @@ subroutine greenfunc(rc,zc,wc,hc,acr,acz,nsr,nsz, &
       do igz=1,ngz
         do igr=1,ngr
           gsplit_rz(igr,igz)=mutpsi(rsplit(isr,isz), &
-            rgrid_rz(igr,igz), zgrid_rz(igr,igz)-zsplit(isr,isz))
+            rgrid_rz(igr,igz), zgrid_rz(igr,igz)-zsplit(isr,isz))*tmu
         enddo
       enddo
       gfgrid_rz=gfgrid_rz+gsplit_rz

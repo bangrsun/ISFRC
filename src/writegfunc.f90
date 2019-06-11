@@ -23,11 +23,6 @@ subroutine writegfunc
   use domain
   use vesel
   use fcoil
-  use acoil
-  use ecoil
-  !use fldiag
-  !use mpdiag
-  !use rogdiag
   implicit none
   logical file_exist
   integer i,j
@@ -39,12 +34,6 @@ subroutine writegfunc
   endif
   if(nfcoil > 0) then
     write(fu_gfunc,*) gffcoil_rzf
-  endif
-  if(nacoil > 0) then
-    write(fu_gfunc,*) gfacoil_rza
-  endif
-  if(necoil > 0) then
-    write(fu_gfunc,*) gfecoil_rze
   endif
 
   flush(fu_gfunc)

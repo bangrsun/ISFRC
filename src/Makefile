@@ -20,7 +20,7 @@ ifeq ($(MACHINE),Linux)
 endif
 
 SOURCES = modules.f90 elliptic.f90 subroutines.f90 \
-					main.f90 getset.f90 calcgfunc.f90 writegfunc.f90
+					main.f90 setup.f90 calcgfunc.f90 writegfunc.f90
 
 OBJECTS=$(SOURCES:.f90=.o)
 
@@ -31,7 +31,7 @@ gfun:$(OBJECTS)
 
 $(filter-out modules.o,$(OBJECTS)):modules.o
 
-main.o: main.f90 subroutines.o getset.o calcgfunc.o writegfunc.o
+main.o: main.f90 subroutines.o setup.o calcgfunc.o writegfunc.o
 	$(FC) $(FFLAGS) -c $< $(LIB)
 
 subroutines.o:subroutines.f90 elliptic.o

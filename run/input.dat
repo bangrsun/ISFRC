@@ -1,11 +1,9 @@
 $expset
  igrid=0,
- nrgrid=65, nzgrid=65,
+ nrgrid=129, nzgrid=129,
  rmin=0.0, rmax=2.25, zmin=-2.1, zmax=2.1
- nfcoil=6 
  nvesel=0
- necoil=0
- nacoil=0  
+ nfcoil=6 
 
 /
 $fcoilset

@@ -25,11 +25,9 @@ program gfun
 
   call cpu_time(start)
 
-  call getset
+  call setup
   call calcgfunc
   call writegfunc
-  !call calcrfunc
-  !call writerfunc
 
   call cpu_time(finish)
   write(*,*) "CPU time used = ",finish - start,'s'
