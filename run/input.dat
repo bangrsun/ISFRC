@@ -4,7 +4,7 @@ $simuset
  rmin=0.0, rmax=1.0, zmin=-1.0, zmax=1.0
  nfcoil=13
 
- nitermax=3  
+ nitermax=30 
  tol=1.0d-12
 
 /
