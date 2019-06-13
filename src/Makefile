@@ -8,7 +8,7 @@ RUN_DIR = ../run
 
 ifeq ($(MACHINE), Darwin)
   FC = gfortran
-  FFLAGS = -g
+  FFLAGS = -g -Wall -fcheck=all
   LDFLAGS =
   LIB =
 endif
