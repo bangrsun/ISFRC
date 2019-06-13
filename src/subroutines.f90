@@ -48,21 +48,22 @@ subroutine splitcoil(rcoil,zcoil,wcoil,hcoil,a1coil,a2coil, &
   return
 end subroutine splitcoil
 !      ^ R coordinate                                                  
-!      |                                     __\_                      
-!      |                               __---`  / ``-                   
-!      |                   hcoil __---`       /                        
-!      |                   __---`            /                         
-!      |             \_---`                 /wcoil                     
-!      |      |a1coil/                     /                           
-! rcoil| - - -|- - -/- - - - - -          /                            
-!      |      |    /           |       __/                             
-!      |      |   /            | __---`   ``-                          
-!      |      |  /         __---`                                      
-!      |      | /    __---`    | a2coil                                
-!      |      |/_---`__________|___                                    
-!      |                       |                                       
+!      |              /<                                               
+!      |      |a1coil/`---_                                            
+!      |      |     /      ``---_hcoil                                 
+!      |      |    /             ``---_                                
+!      |      |   /                    ``---_ >/                       
+!      |      |  /                           `/`--_                    
+! rcoil| _ _ _|_/ _ _ _ _ _ _ _              /                         
+!      |      |/______________|____         /                          
+!      |        `---_         |            /                           
+!      |             ``---_   | a2coil    / wcoil                      
+!      |                   ``---_        /                             
+!      |                      |  ``---_ /                              
+!      |                      |        ``--_                           
+!      |                      |                                        
 !------|-------------------------------------------------------------->
-!     O|                       zcoil                       Z coordinate
+!     O|                     zcoil                         Z coordinate
 
 !***********************************************************************
 ! subprogram description:                                              *
@@ -72,28 +73,26 @@ end subroutine splitcoil
 !      value by 2.0e-07.                                               *
 !                                                                      *
 ! calling arguments:                                                   *
-!   a1..............first filament radius                              *
-!   r1..............second filament radius                             *
+!   a1..............filament radius                                    *
+!   r1..............radius of calcuated points                         *
 !   z1..............vertical separation                                *
 !***********************************************************************
 real*8 function mutpsi(a1,r1,z1)
-  use consta,only:tole
-  use elliptic,only:dellipe,dellipk
+  use consta,only:small
   implicit none
   real*8,intent(in) :: a1,r1,z1
-  real*8 :: a,r,z,tmp1,tmp2,xk,cay,ee
+  real*8 :: a,r,z,tmp1,ksq,kk,ee
 
   a=a1
   r=r1
   z=z1
   tmp1=(a+r)*(a+r)+z*z
   !tmp2=(a-r)*(a-r)+z*z
-  xk=4.0d0*a*r/tmp1
-  if(xk < tole) xk=tole
-  cay=dellipk(xk)
-  ee=dellipe(xk)
+  ksq=4.0d0*a*r/tmp1
+  if(ksq<small) ksq=small
+  call comelp(ksq,kk,ee)
 
-  mutpsi=dsqrt(a*r)*((0.5d0*xk-1.0d0)*cay+ee)/dsqrt(xk)
+  mutpsi=dsqrt(a*r)*((2.0d0-ksq)*kk-2.0d0*ee)/dsqrt(ksq)
   return
 end function mutpsi
 
@@ -106,28 +105,26 @@ end function mutpsi
 !      value by 2.0e-07.                                               *
 !                                                                      *
 ! calling arguments:                                                   *
-!   a1..............first filament radius                              *
-!   r1..............second filament radius                             *
+!   a1..............filament radius                                    *
+!   r1..............radius of calcuated points                         *
 !   z1..............vertical separation                                *
 !***********************************************************************
 real*8 function mutbr(a1,r1,z1)
-  use consta,only:tole
-  use elliptic,only:dellipe,dellipk
+  use consta,only:small
   implicit none
   real*8,intent(in) :: a1,r1,z1
-  real*8 :: a,r,z,tmp1,tmp2,xk,cay,ee
+  real*8 :: a,r,z,tmp1,tmp2,ksq,kk,ee
 
   a=a1
   r=r1
   z=z1
   tmp1=(a+r)*(a+r)+z*z
   tmp2=(a-r)*(a-r)+z*z
-  if(tmp2 < tole) tmp2=tole
-  xk=4.0d0*a*r/tmp1
-  cay=dellipk(xk)
-  ee=dellipe(xk)
+  if(tmp2<small) tmp2=small
+  ksq=4.0d0*a*r/tmp1
+  call comelp(ksq,kk,ee)
 
-  mutbr=z/(r*dsqrt(tmp1))*((a*a+r*r+z*z)/tmp2*ee-cay)
+  mutbr=z/(r*dsqrt(tmp1))*((a*a+r*r+z*z)/tmp2*ee-kk)
   return
 end function mutbr
 
@@ -140,28 +137,26 @@ end function mutbr
 !      value by 2.0e-07.                                               *
 !                                                                      *
 ! calling arguments:                                                   *
-!   a1..............first filament radius                              *
-!   r1..............second filament radius                             *
+!   a1..............filament radius                                    *
+!   r1..............radius of calcuated points                         *
 !   z1..............vertical separation                                *
 !***********************************************************************
 real*8 function mutbz(a1,r1,z1)
-  use consta,only:tole
-  use elliptic,only:dellipe,dellipk
+  use consta,only:small
   implicit none
   real*8,intent(in) :: a1,r1,z1
-  real*8 :: a,r,z,tmp1,tmp2,xk,cay,ee
+  real*8 :: a,r,z,tmp1,tmp2,ksq,kk,ee
 
   a=a1
   r=r1
   z=z1
   tmp1=(a+r)*(a+r)+z*z
   tmp2=(a-r)*(a-r)+z*z
-  if(tmp2 < tole) tmp2=tole
-  xk=4.0d0*a*r/tmp1
-  cay=dellipk(xk)
-  ee=dellipe(xk)
+  if(tmp2<small) tmp2=small
+  ksq=4.0d0*a*r/tmp1
+  call comelp(ksq,kk,ee)
 
-  mutbz=((a*a-r*r-z*z)/tmp2*ee+cay)/dsqrt(tmp1)
+  mutbz=((a*a-r*r-z*z)/tmp2*ee+kk)/dsqrt(tmp1)
   return
 end function mutbz
 

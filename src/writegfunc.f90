@@ -18,23 +18,12 @@
 !                                                                      *
 !***********************************************************************
 subroutine writegfunc
-  use exparam
-  use nio
-  use domain
-  use vesel
-  use fcoil
+  use nio,only:fu_gfunc
+  use global_params,only:gffcoil_rzf
   implicit none
-  logical file_exist
-  integer i,j
-  real*8 dr,dz
 
   open(unit=fu_gfunc,status='unknown',file='gfunc.dat')
-  if(nvesel > 0) then
-    write(fu_gfunc,*) gfvesel_rzv
-  endif
-  if(nfcoil > 0) then
-    write(fu_gfunc,*) gffcoil_rzf
-  endif
+  write(fu_gfunc,*) gffcoil_rzf
 
   flush(fu_gfunc)
   close(fu_gfunc)
