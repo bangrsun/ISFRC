@@ -10,66 +10,94 @@
 ! (c) All rights reserved.                                             *
 !***********************************************************************
 
-module elliptic
+subroutine comelp ( hk2, ck, ce )
+
+!*****************************************************************************80
+!
+!! COMELP computes complete elliptic integrals K(k) and E(k).
+!
+!  Licensing:
+!
+!    This routine is copyrighted by Shanjie Zhang and Jianming Jin.  However, 
+!    they give permission to incorporate this routine into a user program 
+!    provided that the copyright is acknowledged.
+!
+!  Modified:
+!
+!    07 July 2012
+!
+!  Author:
+!
+!    Shanjie Zhang, Jianming Jin
+!
+!  Reference:
+!
+!    Shanjie Zhang, Jianming Jin,
+!    Computation of Special Functions,
+!    Wiley, 1996,
+!    ISBN: 0-471-11963-6,
+!    LC: QA351.C45.
+!
+!  Parameters:
+!
+!    Input, real ( kind = 8 ) HK, the modulus.  0 <= HK <= 1.
+!
+!    Output, real ( kind = 8 ) CK, CE, the values of K(HK) and E(HK).
+!
   implicit none
 
-contains
-!***********************************************************************
-! subprogram description:                                              *
-!   dellipe computes the elliptic integral e in double                 *
-!   precision.                                                         *
-!                                                                      *
-! calling arguments:                                                   *
-!   xm1.............argument of elliptic integral e                    *
-!***********************************************************************
-elemental real*8 function dellipe(xm1)
-  implicit none
-  real*8,intent(in) :: xm1
-  real*8,dimension(4) :: a,b
+  real ( kind = 8 ) ae
+  real ( kind = 8 ) ak
+  real ( kind = 8 ) be
+  real ( kind = 8 ) bk
+  real ( kind = 8 ) ce
+  real ( kind = 8 ) ck
+  real ( kind = 8 ) hk2 ! hk2=hk*hk
+  real ( kind = 8 ) pk
 
-  a(1)=.44325141463
-  a(2)=.06260601220
-  a(3)=.04757383546
-  a(4)=.01736506451
-  b(1)=.24998368310
-  b(2)=.09200180037
-  b(3)=.04069697526
-  b(3)=.00526449639
+  !pk = 1.0D+00 - hk * hk
+  pk = 1.0D+00 - hk2
 
-  dellipe=1.0+xm1*(a(1)+xm1*(a(2)+xm1*(a(3)+xm1*a(4)))) &
-    +xm1*(b(1)+xm1*(b(2)+xm1*(b(3)+xm1*b(4))))*dlog(1.0/xm1)
+  if ( hk2 == 1.0D+00 ) then
+
+    ck = 1.0D+300
+    ce = 1.0D+00
+
+  else
+
+    ak = ((( &
+        0.01451196212D+00   * pk &
+      + 0.03742563713D+00 ) * pk &
+      + 0.03590092383D+00 ) * pk &
+      + 0.09666344259D+00 ) * pk &
+      + 1.38629436112D+00
+
+    bk = ((( &
+        0.00441787012D+00   * pk &
+      + 0.03328355346D+00 ) * pk &
+      + 0.06880248576D+00 ) * pk &
+      + 0.12498593597D+00 ) * pk &
+      + 0.5D+00
+
+    ck = ak - bk * log ( pk )
+
+    ae = ((( &
+        0.01736506451D+00   * pk &
+      + 0.04757383546D+00 ) * pk &
+      + 0.0626060122D+00  ) * pk &
+      + 0.44325141463D+00 ) * pk &
+      + 1.0D+00
+
+    be = ((( &
+        0.00526449639D+00   * pk &
+      + 0.04069697526D+00 ) * pk &
+      + 0.09200180037D+00 ) * pk &
+      + 0.2499836831D+00  ) * pk
+
+    ce = ae - be * log ( pk )
+
+  end if
+
   return
-end function dellipe
+end
 
-
-!***********************************************************************
-! subprogram description:                                              *
-!   dellipk computes the elliptic integral k in double                 *
-!   precision.                                                         *
-!                                                                      *
-! calling arguments:                                                   *
-!   xm1.............argument of elliptic integral k                    *
-!***********************************************************************
-elemental real*8 function dellipk(xm1)
-  implicit none
-  real*8,intent(in) :: xm1
-  real*8,dimension(5) :: a,b
-
-  a(1)=1.38629436112
-  a(2)=0.09666344259
-  a(3)=0.03590092383
-  a(4)=0.03742563713
-  a(5)=0.01451196212
-  b(1)=0.5
-  b(2)=0.12498593597
-  b(3)=0.06880248576
-  b(4)=0.03328355346
-  b(5)=0.00441787012
-
-  dellipk=a(1)+xm1*(a(2)+xm1*(a(3)+xm1*(a(4)+xm1*a(5))))&
-   +(b(1)+xm1*(b(2)+xm1*(b(3)+xm1*(b(4)+xm1*b(5)))))&
-   *dlog(1.0/xm1)
-  return
-end function dellipk
-
-end module elliptic

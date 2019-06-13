@@ -18,11 +18,9 @@
 !                                                                      *
 !***********************************************************************
 subroutine setup
-  use exparam
   use nio
-  use domain
-  use vesel
-  use fcoil
+  use readin_params
+  use global_params
   implicit none
   logical file_exist
   integer i,j
@@ -37,68 +35,74 @@ subroutine setup
     stop
   endif
   open(unit=fu_input,status='old',file='input.dat')
-  read(fu_input,nml=expset)
-  if(nrgrid <= 0 .or. nzgrid <= 0) then
-    write(*,*) "Wrong grid settings for nrgrid and nzgrid !!!"
+  read(fu_input,nml=simuset)
+  if(ngr <= 0 .or. ngz <= 0) then
+    write(*,*) "Wrong grid settings for ngr and ngz !!!"
     stop
   endif
-  !-- if vesel enabled ------------------------------------------------
-  if(nvesel > 0) then
-    allocate(r_v(nvesel),z_v(nvesel),w_v(nvesel),h_v(nvesel), &
-      ar_v(nvesel),az_v(nvesel))
-    allocate(gfvesel_rzv(nrgrid,nzgrid,nvesel))
-    r_v=0.0d0
-    z_v=0.0d0
-    w_v=0.0d0
-    h_v=0.0d0
-    ar_v=0.0d0
-    az_v=0.0d0
-    gfvesel_rzv=0.0d0
-    read(fu_input,nml=veselset)
-    if(w_v(nvesel) == 0.0d0 .or. h_v(nvesel) == 0.0d0) then
-      write(*,*) "Waring: length of vesel segments coordinate < nfcoil !"
-    endif
+!----------------------------------------------------------------------
+!-- read fcoil settings                                              --
+!----------------------------------------------------------------------
+  if(nfcoil <= 0) then
+    write(*,*) "Wrong fcoil settings : nfcoil = ",nfcoil
+    stop
   endif
-  !-- if fcoil enabled ------------------------------------------------
-  if(nfcoil > 0) then
-    allocate(r_f(nfcoil),z_f(nfcoil),w_f(nfcoil),h_f(nfcoil), &
-      ar_f(nfcoil),az_f(nfcoil),nsr_f(nfcoil),nsz_f(nfcoil))
-    allocate(gffcoil_rzf(nrgrid,nzgrid,nfcoil))
-    r_f=0.0d0
-    z_f=0.0d0
-    w_f=0.0d0
-    h_f=0.0d0
-    ar_f=0.0d0
-    az_f=0.0d0
-    nsr_f=1
-    nsz_f=1
-    gffcoil_rzf=0.0d0
-    read(fu_input,nml=fcoilset)
-    if(w_f(nfcoil) == 0.0d0 .or. h_f(nfcoil) == 0.0d0) then
-      write(*,*) "Waring: length of fcoil coordinate < nfcoil !"
-    endif
+  allocate(r_f(nfcoil),z_f(nfcoil),w_f(nfcoil),h_f(nfcoil), &
+    ar_f(nfcoil),az_f(nfcoil),nsr_f(nfcoil),nsz_f(nfcoil),J_f(nfcoil))
+  r_f=0.0d0
+  z_f=0.0d0
+  w_f=0.0d0
+  h_f=0.0d0
+  ar_f=0.0d0
+  az_f=0.0d0
+  nsr_f=1
+  nsz_f=1
+  J_f=0.0d0
+  read(fu_input,nml=fcoilset)
+  if(w_f(nfcoil) == 0.0d0 .or. h_f(nfcoil) == 0.0d0) then
+    write(*,*) "Warning: length of fcoil coordinate < nfcoil !"
   endif
   close(fu_input)
 !----------------------------------------------------------------------
-!-- read grid parameters or make grid meshes                         --
+!-- allocate memory for global parameters                            --
 !----------------------------------------------------------------------
-  allocate(rgrid_rz(nrgrid,nzgrid),zgrid_rz(nrgrid,nzgrid))
-  allocate(gfplas_rzrz(nrgrid,nzgrid,nrgrid,nzgrid))
+  allocate(rgrid_rz(ngr,ngz),zgrid_rz(ngr,ngz))
+  allocate(dr_rz(ngr-1,ngz-1),dz_rz(ngr-1,ngz-1))
+  allocate(gffcoil_rzf(ngr,ngz,nfcoil),gfplas_rzrz(ngr,ngz,ngr,ngz))
+  allocate(psi_rz(ngr,ngz),psip_rz(ngr,ngz),psif_rz(ngr,ngz))
+  allocate(psinew_rz(ngr,ngz),dpsi_rz(ngr,ngz))
+  allocate(pres_rz(ngr,ngz),dp_rz(ngr-1,ngz-1),Jzeta_rz(ngr,ngz))
   rgrid_rz=0.0d0
   zgrid_rz=0.0d0
+  dr_rz=0.0d0
+  dz_rz=0.0d0
   gfplas_rzrz=0.0d0
+  gffcoil_rzf=0.0d0
+  psi_rz=0.0d0
+  psip_rz=0.0d0
+  psif_rz=0.0d0
+  psinew_rz=0.0d0
+  dpsi_rz=0.0d0
+  pres_rz=0.0d0
+  dp_rz=0.0d0
+  Jzeta_rz=0.0d0
+!----------------------------------------------------------------------
+!-- read grid parameters or make grid meshes                         --
+!----------------------------------------------------------------------
   if(igrid == 0) then
-    dr=(rmax-rmin)/float(nrgrid-1)
-    dz=(zmax-zmin)/float(nzgrid-1)
-    do j=1,nzgrid
-      do i=1,nrgrid
+    dr=(rmax-rmin)/float(ngr-1)
+    dz=(zmax-zmin)/float(ngz-1)
+    dr_rz=dr
+    dz_rz=dz
+    do j=1,ngz
+      do i=1,ngr
         rgrid_rz(i,j)=rmin+(i-1)*dr
         zgrid_rz(i,j)=zmin+(j-1)*dz
       enddo
     enddo
     open(unit=fu_grid,status='unknown',file='grid.dat')
-    write(fu_grid,*) ((rgrid_rz(i,j), i=1,nrgrid), j=1,nzgrid)
-    write(fu_grid,*) ((zgrid_rz(i,j), i=1,nrgrid), j=1,nzgrid)
+    write(fu_grid,*) ((rgrid_rz(i,j), i=1,ngr), j=1,ngz)
+    write(fu_grid,*) ((zgrid_rz(i,j), i=1,ngr), j=1,ngz)
     close(fu_grid)
   elseif(igrid == 1) then
     inquire(file='grid.dat',exist=file_exist)
@@ -107,8 +111,14 @@ subroutine setup
       stop
     endif
     open(unit=fu_grid,status='old',file='grid.dat')
-    read(fu_grid,*) ((rgrid_rz(i,j), i=1,nrgrid), j=1,nzgrid)
-    read(fu_grid,*) ((zgrid_rz(i,j), i=1,nrgrid), j=1,nzgrid)
+    read(fu_grid,*) ((rgrid_rz(i,j), i=1,ngr), j=1,ngz)
+    read(fu_grid,*) ((zgrid_rz(i,j), i=1,ngr), j=1,ngz)
+    do j=1,ngz-1
+      do i=1,ngr-1
+        dr_rz(i,j)=rgrid_rz(i,j+1)-rgrid_rz(i,j)
+        dz_rz(i,j)=zgrid_rz(i,j+1)-zgrid_rz(i,j)
+      enddo
+    enddo
     close(fu_grid)
   endif
 

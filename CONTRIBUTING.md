@@ -1,4 +1,4 @@
-# 开发者须知(NOTE TO DEVELOPERS)
+# 开发者须知(CONTRIBUTION GUIDE)
 ------
 
 首先，非常感谢你能帮助我们完善此项目。但是...，我们都知道，在一个项目的整个
