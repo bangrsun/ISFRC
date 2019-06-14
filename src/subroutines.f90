@@ -56,27 +56,6 @@ end subroutine calcJzeta
 
 !***********************************************************************
 ! subprogram description:                                              *
-!      calcpsif calculate the psi according to the ploidal field       *
-!      coil current J_f and it's Green's function.                     *
-!                                                                      *
-! calling arguments:                                                   *
-!                                                                      *
-!***********************************************************************
-subroutine calcpsif
-  use consta, only:mu0,pi
-  use readin_params,only:nfcoil,J_f
-  use global_params,only:psif_rz,gffcoil_rzf
-  implicit none
-  integer*4 :: i
-
-  psif_rz=0.0d0
-  do i=1,nfcoil
-    psif_rz(:,:)=psif_rz(:,:)+mu0/2.0d0/pi*J_f(i)*gffcoil_rzf(:,:,i)
-  enddo
-end subroutine calcpsif
-
-!***********************************************************************
-! subprogram description:                                              *
 !      calcpsip calculate the psi according to the plasma current      *
 !      Jzeta and the Green's function by plasma itself.                *
 !                                                                      *
