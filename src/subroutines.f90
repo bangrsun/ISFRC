@@ -20,35 +20,44 @@
 !***********************************************************************
 subroutine calcJzeta
   use consta,only:mu0
-  use readin_params,only:ngr,ngz
-  use global_params,only:rgrid_rz,dr_rz,dz_rz,Jzeta_rz,psi_rz
+  use readin_params,only:ngr,ngz,ipres,cn
+  use global_params,only:ngr1,ngz1,rgrid_rz,dr_rz,dz_rz, &
+    Jzeta_rz,pprim_rz,psi_rz,Jztot
   implicit none
   integer*4 :: i,j
+  real*8 :: xtmp,sechx
 
-  do j=2,ngz-1
-    do i=2,ngr-1
-      Jzeta_rz(i,j)=-1.0d0/(mu0*rgrid_rz(i,j))*( &
-        (psi_rz(i+1,j)-2.0*psi_rz(i,j)+psi_rz(i-1,j))/(dr_rz(i,j)*dr_rz(i,j)) &
-        -(1.0d0/rgrid_rz(i,j))*(psi_rz(i+1,j)-psi_rz(i-1,j))/(2*dr_rz(i,j)) &
-        +(psi_rz(i,j+1)-2.0*psi_rz(i,j)+psi_rz(i,j-1))/(dz_rz(i,j)*dz_rz(i,j)) &
-        )
+  Jzeta_rz=0.0d0
+  do j=1,ngz
+    do i=1,ngr
+      if(ipres==1) then
+        pprim_rz(i,j)=0.0
+        if(psi_rz(i,j)>0.0) then
+          pprim_rz(i,j)=cn(1)
+        endif
+      elseif(ipres==2) then ! assume P=c1*sech(c2*(psi-c3))
+        xtmp=cn(2)*(psi_rz(i,j)-cn(3))
+        sechx=2.0/(exp(xtmp)+exp(-xtmp))
+        pprim_rz(i,j)=-cn(2)*cn(1)*tanh(xtmp)*sechx/mu0
+      else
+        xtmp=cn(2)*(psi_rz(i,j)-cn(3))
+        pprim_rz(i,j)=cn(1)*(1.0-tanh(xtmp))/mu0
+      endif
+      Jzeta_rz(i,j)=rgrid_rz(i,j)*pprim_rz(i,j)
     enddo
   enddo
   ! solid boundary condition in r direction
   Jzeta_rz(1,:)=0.0d0
-  Jzeta_rz(ngr,:)=0.0d0
+  Jzeta_rz(ngr1,:)=0.0d0
   ! solid boundary condition in z direction
   Jzeta_rz(:,1)=0.0d0
-  Jzeta_rz(:,ngz)=0.0d0
-  ! periodic boundary condition in z direction
-  !do i=2,ngr-1
-  !  Jzeta_rz(i,1)=-1.0d0/(mu0*rgrid_rz(i,1))*( &
-  !    (psi_rz(i+1,1)-2.0*psi_rz(i,1)+psi_rz(i-1,1))/(dr_rz(i,1)*dr_rz(i,1)) &
-  !    -(1.0d0/rgrid_rz(i,1))*(psi_rz(i+1,1)-psi_rz(i-1,1))/(2*dr_rz(i,1)) &
-  !    +(psi_rz(i,2)-2.0*psi_rz(i,1)+psi_rz(i,ngz))/(dz_rz(i,1)*dz_rz(i,1)) &
-  !    )
-  !enddo
-  !Jzeta_rz(:,ngz)=Jzeta_rz(:,1)
+  Jzeta_rz(:,ngz1)=0.0d0
+  Jztot=0.0d0
+  do j=2,ngz
+    do i=2,ngr
+      Jztot=Jztot+Jzeta_rz(i,j)*dr_rz(i,j)*dz_rz(i,j)
+    enddo
+  enddo
   
   return
 end subroutine calcJzeta
@@ -70,8 +79,8 @@ subroutine calcpsip
   integer*4 :: ig,jg
 
   psip_rz=0.0d0
-  do jg=1,ngz-1
-    do ig=1,ngr-1
+  do jg=1,ngz
+    do ig=1,ngr
       psip_rz(:,:)=psip_rz(:,:) &
         +mu0/2.0d0/pi*Jzeta_rz(ig,jg)*dr_rz(ig,jg)*dz_rz(ig,jg) &
         *gfplas_rzrz(:,:,ig,jg)
