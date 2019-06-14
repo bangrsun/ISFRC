@@ -54,9 +54,9 @@ module readin_params
 
   !> flag for define grids, =0 uniform, =1 customed
   integer*4 :: igrid
-  !> number of grids in R direction
+  !> number of grids in R direction, without outer boundary
   integer*4 :: ngr
-  !> number of grids in Z direction
+  !> number of grids in Z direction, without outer boundary
   integer*4 :: ngz
   !> border of calculation box, 
   !  must be defined if igrid=0, no meaning if igrid=1
@@ -86,6 +86,9 @@ module readin_params
   real*8,dimension(:),allocatable :: J_f
 
 
+  integer*4 :: ipres
+  real*8 :: Izeta
+  real*8,dimension(3) :: cn
   !> maximum iteration steps
   integer*4 :: nitermax
   !> output tolerance for delta psi
@@ -93,7 +96,7 @@ module readin_params
 
   namelist/simuset/ igrid,ngr,ngz,rmin,rmax,zmin,zmax &
     ,nfcoil &
-    ,nitermax,tol
+    ,ipres,Izeta,cn,nitermax,tol
 
   namelist/fcoilset/ r_f,z_f,w_f,h_f,ar_f,az_f,nsr_f,nsz_f,J_f
 
@@ -107,6 +110,10 @@ module global_params
   implicit none
   public
 
+  !> number of grids in R direction, with outer boundary, ngr1=ngr+1
+  integer*4 :: ngr1
+  !> number of grids in Z direction, with outer boundary, ngz1=ngz+1
+  integer*4 :: ngz1
   !> R coordinate of grid points, must be defined if igrid=1
   real*8,dimension(:,:),allocatable :: rgrid_rz
   !> Z coordinate of grid points, must be defined if igrid=1
@@ -131,10 +138,11 @@ module global_params
   real*8,dimension(:,:),allocatable :: dpsi_rz
   !> pressure at grid points
   real*8,dimension(:,:),allocatable :: pres_rz
-  !> delta pressure at grid points
-  real*8,dimension(:,:),allocatable :: dp_rz
+  !> dp/dpsi at grid points
+  real*8,dimension(:,:),allocatable :: pprim_rz
   !> current density at grid points
   real*8,dimension(:,:),allocatable :: Jzeta_rz
+  real*8 :: Jztot
 
 end module global_params
 

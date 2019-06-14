@@ -12,151 +12,80 @@
 
 !***********************************************************************
 ! subprogram description:                                              *
-!                                                                      *
+!      calcJzeta calculate Jzeta at grid points from psi according to  *
+!      Grad-Shafranov equation.                                        *
 !                                                                      *
 ! calling arguments:                                                   *
 !                                                                      *
 !***********************************************************************
-subroutine splitcoil(rcoil,zcoil,wcoil,hcoil,a1coil,a2coil, &
-    nsr,nsz,rsplit_rz,zsplit_rz)
-  use consta,only:pi
+subroutine calcJzeta
+  use consta,only:mu0
+  use readin_params,only:ngr,ngz,ipres,cn
+  use global_params,only:ngr1,ngz1,rgrid_rz,dr_rz,dz_rz, &
+    Jzeta_rz,pprim_rz,psi_rz,Jztot
   implicit none
-  real*8,   intent(in) :: rcoil,zcoil,wcoil,hcoil,a1coil,a2coil
-  integer*4,intent(in) :: nsr,nsz
-  real*8,dimension(nsr,nsz),intent(out) :: rsplit_rz,zsplit_rz
-  real*8 :: frd,dw,dh,dr1,dz1,dr2,dz2,rstrt,zstrt
-  integer :: ii,jj
+  integer*4 :: i,j
+  real*8 :: xtmp,sechx
 
-  frd=pi/180.0d0
-  dw=wcoil/nsr
-  dh=hcoil/nsz
-  dr1=dw*dcos(frd*a1coil)
-  dz1=dh*dcos(frd*a2coil)
-  dr2=dh*dsin(frd*a2coil)
-  dz2=dw*dsin(frd*a1coil)
-  rstrt=rcoil-0.5d0*(wcoil*dcos(frd*a1coil)+hcoil*dsin(frd*a2coil)) &
-    +0.5d0*(dr1+dr2)
-  zstrt=zcoil-0.5d0*(hcoil*dcos(frd*a2coil)+wcoil*dsin(frd*a1coil)) &
-    +0.5d0*(dz1+dz2)
-  do jj=1,nsz
-    do ii=1,nsr
-      rsplit_rz(ii,jj)=rstrt+(ii-1)*dr1+(jj-1)*dr2
-      zsplit_rz(ii,jj)=zstrt+(jj-1)*dz1+(ii-1)*dz2
-    enddo 
+  Jzeta_rz=0.0d0
+  do j=1,ngz
+    do i=1,ngr
+      if(ipres==1) then
+        pprim_rz(i,j)=0.0
+        if(psi_rz(i,j)>0.0) then
+          pprim_rz(i,j)=cn(1)
+        endif
+      elseif(ipres==2) then ! assume P=c1*sech(c2*(psi-c3))
+        xtmp=cn(2)*(psi_rz(i,j)-cn(3))
+        sechx=2.0/(exp(xtmp)+exp(-xtmp))
+        pprim_rz(i,j)=-cn(2)*cn(1)*tanh(xtmp)*sechx/mu0
+      else
+        xtmp=cn(2)*(psi_rz(i,j)-cn(3))
+        pprim_rz(i,j)=cn(1)*(1.0-tanh(xtmp))/mu0
+      endif
+      Jzeta_rz(i,j)=rgrid_rz(i,j)*pprim_rz(i,j)
+    enddo
+  enddo
+  ! solid boundary condition in r direction
+  Jzeta_rz(1,:)=0.0d0
+  Jzeta_rz(ngr1,:)=0.0d0
+  ! solid boundary condition in z direction
+  Jzeta_rz(:,1)=0.0d0
+  Jzeta_rz(:,ngz1)=0.0d0
+  Jztot=0.0d0
+  do j=2,ngz
+    do i=2,ngr
+      Jztot=Jztot+Jzeta_rz(i,j)*dr_rz(i,j)*dz_rz(i,j)
+    enddo
+  enddo
+  
+  return
+end subroutine calcJzeta
+
+
+!***********************************************************************
+! subprogram description:                                              *
+!      calcpsip calculate the psi according to the plasma current      *
+!      Jzeta and the Green's function by plasma itself.                *
+!                                                                      *
+! calling arguments:                                                   *
+!                                                                      *
+!***********************************************************************
+subroutine calcpsip
+  use consta,only:mu0,pi
+  use readin_params,only:ngr,ngz
+  use global_params,only:dr_rz,dz_rz,Jzeta_rz,psip_rz,gfplas_rzrz
+  implicit none
+  integer*4 :: ig,jg
+
+  psip_rz=0.0d0
+  do jg=1,ngz
+    do ig=1,ngr
+      psip_rz(:,:)=psip_rz(:,:) &
+        +mu0/2.0d0/pi*Jzeta_rz(ig,jg)*dr_rz(ig,jg)*dz_rz(ig,jg) &
+        *gfplas_rzrz(:,:,ig,jg)
+    enddo
   enddo
 
-  return
-end subroutine splitcoil
-!      ^ R coordinate                                                  
-!      |              /<                                               
-!      |      |a1coil/`---_                                            
-!      |      |     /      ``---_hcoil                                 
-!      |      |    /             ``---_                                
-!      |      |   /                    ``---_ >/                       
-!      |      |  /                           `/`--_                    
-! rcoil| _ _ _|_/ _ _ _ _ _ _ _              /                         
-!      |      |/______________|____         /                          
-!      |        `---_         |            /                           
-!      |             ``---_   | a2coil    / wcoil                      
-!      |                   ``---_        /                             
-!      |                      |  ``---_ /                              
-!      |                      |        ``--_                           
-!      |                      |                                        
-!------|-------------------------------------------------------------->
-!     O|                     zcoil                         Z coordinate
-
-!***********************************************************************
-! subprogram description:                                              *
-!      mutpsi computes mutual inductance/2/pi between two              *
-!      circular filaments of radii a1 and r1 and                       *
-!      separation of z1, for mks units multiply returned               *
-!      value by 2.0e-07.                                               *
-!                                                                      *
-! calling arguments:                                                   *
-!   a1..............filament radius                                    *
-!   r1..............radius of calcuated points                         *
-!   z1..............vertical separation                                *
-!***********************************************************************
-real*8 function mutpsi(a1,r1,z1)
-  use consta,only:small
-  implicit none
-  real*8,intent(in) :: a1,r1,z1
-  real*8 :: a,r,z,tmp1,ksq,kk,ee
-
-  a=a1
-  r=r1
-  z=z1
-  tmp1=(a+r)*(a+r)+z*z
-  !tmp2=(a-r)*(a-r)+z*z
-  ksq=4.0d0*a*r/tmp1
-  if(ksq<small) ksq=small
-  call comelp(ksq,kk,ee)
-
-  mutpsi=dsqrt(a*r)*((2.0d0-ksq)*kk-2.0d0*ee)/dsqrt(ksq)
-  return
-end function mutpsi
-
-
-!***********************************************************************
-! subprogram description:                                              *
-!      mutbr computes mutual inductance/2/pi between two               *
-!      circular filaments of radii a1 and r1 and                       *
-!      separation of z1, for mks units multiply returned               *
-!      value by 2.0e-07.                                               *
-!                                                                      *
-! calling arguments:                                                   *
-!   a1..............filament radius                                    *
-!   r1..............radius of calcuated points                         *
-!   z1..............vertical separation                                *
-!***********************************************************************
-real*8 function mutbr(a1,r1,z1)
-  use consta,only:small
-  implicit none
-  real*8,intent(in) :: a1,r1,z1
-  real*8 :: a,r,z,tmp1,tmp2,ksq,kk,ee
-
-  a=a1
-  r=r1
-  z=z1
-  tmp1=(a+r)*(a+r)+z*z
-  tmp2=(a-r)*(a-r)+z*z
-  if(tmp2<small) tmp2=small
-  ksq=4.0d0*a*r/tmp1
-  call comelp(ksq,kk,ee)
-
-  mutbr=z/(r*dsqrt(tmp1))*((a*a+r*r+z*z)/tmp2*ee-kk)
-  return
-end function mutbr
-
-
-!***********************************************************************
-! subprogram description:                                              *
-!      mutbz computes mutual inductance/2/pi between two               *
-!      circular filaments of radii a1 and r1 and                       *
-!      separation of z1, for mks units multiply returned               *
-!      value by 2.0e-07.                                               *
-!                                                                      *
-! calling arguments:                                                   *
-!   a1..............filament radius                                    *
-!   r1..............radius of calcuated points                         *
-!   z1..............vertical separation                                *
-!***********************************************************************
-real*8 function mutbz(a1,r1,z1)
-  use consta,only:small
-  implicit none
-  real*8,intent(in) :: a1,r1,z1
-  real*8 :: a,r,z,tmp1,tmp2,ksq,kk,ee
-
-  a=a1
-  r=r1
-  z=z1
-  tmp1=(a+r)*(a+r)+z*z
-  tmp2=(a-r)*(a-r)+z*z
-  if(tmp2<small) tmp2=small
-  ksq=4.0d0*a*r/tmp1
-  call comelp(ksq,kk,ee)
-
-  mutbz=((a*a-r*r-z*z)/tmp2*ee+kk)/dsqrt(tmp1)
-  return
-end function mutbz
+end subroutine calcpsip
 

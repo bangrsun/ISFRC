@@ -19,24 +19,24 @@
 ! calling arguments:                                                   *
 !                                                                      *
 !***********************************************************************
-subroutine calcgfunc
+subroutine load
   use readin_params
   use global_params
   implicit none
-  real*8,dimension(ngr,ngz) :: gftmp
+  real*8,dimension(ngr1,ngz1) :: gftmp
   real*8,external :: mutpsi
   integer i,j,jg,ig
 
 !----------------------------------------------------------------------
 !-- calculate Green's function of plasma itself                      --
 !----------------------------------------------------------------------
-  do jg=1,ngz
-    do ig=1,ngr
+  do jg=1,ngz1
+    do ig=1,ngr1
       if(rgrid_rz(ig,jg)<=0.0d0) then
         gfplas_rzrz(:,:,ig,jg)=0.0d0
       else
-        do j=1,ngz
-          do i=1,ngr
+        do j=1,ngz1
+          do i=1,ngr1
             if(i==ig .and. j==jg) then
               gfplas_rzrz(i,j,ig,jg)=0.0d0
             else
@@ -54,19 +54,53 @@ subroutine calcgfunc
   if(nfcoil > 0) then
     do i=1,nfcoil
       call greenfunc(r_f(i),z_f(i),w_f(i),h_f(i),ar_f(i),az_f(i), &
-        nsr_f(i),nsz_f(i),ngr,ngz,rgrid_rz,zgrid_rz,gftmp)
+        nsr_f(i),nsz_f(i),ngr1,ngz1,rgrid_rz,zgrid_rz,gftmp)
       gffcoil_rzf(:,:,i)=gftmp
     enddo
   endif
+!----------------------------------------------------------------------
+!-- calculate psi by fcoils                                          --
+!----------------------------------------------------------------------
+  call calcpsif
+!----------------------------------------------------------------------
+!-- load initial psi at grid points                                  --
+!----------------------------------------------------------------------
+  psip_rz=0.0d0
+  psi_rz(:,:)=psip_rz(:,:)+psif_rz(:,:)
  
   return
-end subroutine calcgfunc
+end subroutine load
+
+
+!***********************************************************************
+! subprogram description:                                              *
+!      calcpsif calculate the psi according to the ploidal field       *
+!      coil current J_f and it's Green's function.                     *
+!                                                                      *
+! calling arguments:                                                   *
+!                                                                      *
+!***********************************************************************
+subroutine calcpsif
+  use consta, only:mu0,pi
+  use readin_params,only:nfcoil,J_f
+  use global_params,only:psif_rz,gffcoil_rzf
+  implicit none
+  integer*4 :: i
+
+  psif_rz=0.0d0
+  do i=1,nfcoil
+    psif_rz(:,:)=psif_rz(:,:)+mu0/2.0d0/pi*J_f(i)*gffcoil_rzf(:,:,i)
+  enddo
+end subroutine calcpsif
 
 
 !***********************************************************************
 ! subprogram description:                                              *
 !      greenfunc computes the Green's functions at (r,z)               *
-!      due to current loops.                                           *
+!      due to coil with width and height.                              *
+!                                                                      *
+! calling arguments:                                                   *
+!                                                                      *
 !***********************************************************************
 subroutine greenfunc(rc,zc,wc,hc,acr,acz,nsr,nsz, &
     ngr,ngz,rgrid_rz,zgrid_rz,gfgrid_rz)
