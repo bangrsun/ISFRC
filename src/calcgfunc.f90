@@ -66,7 +66,7 @@ end subroutine calcgfunc
 !***********************************************************************
 ! subprogram description:                                              *
 !      greenfunc computes the Green's functions at (r,z)               *
-!      due to current loops.                                           *
+!      due to coil with width and height.                              *
 !***********************************************************************
 subroutine greenfunc(rc,zc,wc,hc,acr,acz,nsr,nsz, &
     ngr,ngz,rgrid_rz,zgrid_rz,gfgrid_rz)

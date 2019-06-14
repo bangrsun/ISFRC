@@ -19,7 +19,7 @@ ifeq ($(MACHINE),Linux)
   LIB =
 endif
 
-SOURCES = modules.f90 elliptic.f90 subroutines.f90 \
+SOURCES = modules.f90 elliptic.f90 utilities.f90 subroutines.f90 \
 					main.f90 setup.f90 calcgfunc.f90 writegfunc.f90
 
 OBJECTS=$(SOURCES:.f90=.o)
@@ -34,26 +34,13 @@ $(filter-out modules.o,$(OBJECTS)):modules.o
 main.o: main.f90 subroutines.o setup.o calcgfunc.o writegfunc.o
 	$(FC) $(FFLAGS) -c $< $(LIB)
 
-subroutines.o:subroutines.f90 elliptic.o
+utilities.o:utilities.f90 elliptic.o
 	$(FC) $(FFLAGS) -c $< $(LIB)
 
 %.o:%.f90
 	$(FC) $(FFLAGS) -c $< $(LIB)
 
-#modules.o: modules.f90
-#	$(FC) $(FFLAGS) -c $< $(LIB)
-#
-#subroutines.o: subroutines.f90 module.o
-#	$(FC) $(FFLAGS) -c $< $(LIB)
-#
-#getset.o: getset.f90 module.o
-#	$(FC) $(FFLAGS) -c $< $(LIB)
-#
-#calcgfunc.o: calcgfunc.f90 module.o
-#	$(FC) $(FFLAGS) -c $< $(LIB)
-#
-#writegfunc.o: writegfunc.f90 module.o
-#	$(FC) $(FFLAGS) -c $< $(LIB)
+.PHONY: clean
 
 clean:
 	rm *.o *.mod gfun
