@@ -21,7 +21,7 @@
 !***********************************************************************
 program main
   use consta,only:mu0,pi
-  use readin_params,only:nitermax,tol
+  use readin_params,only:Izeta,nitermax,tol
   use global_params
   use nio
   implicit none
@@ -49,9 +49,10 @@ program main
   write(fu_output,*) 'MAIN ITERATION LOOP STARTED!'
   it=0
   dpsi=10*tol
-  do while(it<nitermax .and. dpsi>tol)
+  write(*,*) "Izeta = ",Izeta
+  do while(it<nitermax .and. abs(Izeta-Jztot)>100)
+  !do while(it<nitermax .and. dpsi>tol .and. abs(Izeta-Jztot)>100)
     it=it+1
-    write(*,*) "it = ",it
     !-- calculate Jzeta from psi---------------------------------------
     call calcJzeta
     !-- update psip from Jzeta ----------------------------------------
@@ -62,6 +63,8 @@ program main
     dpsi=maxval(abs(dpsi_rz))
 
     psi_rz(:,:)=psinew_rz(:,:)
+    write(*,*) "it = ",it,", dpsi = ",dpsi,"Jztot = ",Jztot
+    write(*,*) "Izeta-Jztot = ",Izeta-Jztot
   enddo
 !----------------------------------------------------------------------
 !-- output psi and Jzeta                                             --

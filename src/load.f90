@@ -23,20 +23,20 @@ subroutine load
   use readin_params
   use global_params
   implicit none
-  real*8,dimension(ngr,ngz) :: gftmp
+  real*8,dimension(ngr1,ngz1) :: gftmp
   real*8,external :: mutpsi
   integer i,j,jg,ig
 
 !----------------------------------------------------------------------
 !-- calculate Green's function of plasma itself                      --
 !----------------------------------------------------------------------
-  do jg=1,ngz
-    do ig=1,ngr
+  do jg=1,ngz1
+    do ig=1,ngr1
       if(rgrid_rz(ig,jg)<=0.0d0) then
         gfplas_rzrz(:,:,ig,jg)=0.0d0
       else
-        do j=1,ngz
-          do i=1,ngr
+        do j=1,ngz1
+          do i=1,ngr1
             if(i==ig .and. j==jg) then
               gfplas_rzrz(i,j,ig,jg)=0.0d0
             else
@@ -54,7 +54,7 @@ subroutine load
   if(nfcoil > 0) then
     do i=1,nfcoil
       call greenfunc(r_f(i),z_f(i),w_f(i),h_f(i),ar_f(i),az_f(i), &
-        nsr_f(i),nsz_f(i),ngr,ngz,rgrid_rz,zgrid_rz,gftmp)
+        nsr_f(i),nsz_f(i),ngr1,ngz1,rgrid_rz,zgrid_rz,gftmp)
       gffcoil_rzf(:,:,i)=gftmp
     enddo
   endif
