@@ -29,30 +29,26 @@ program main
   integer*4 :: it
   real*8 :: dpsi
 
-  !call cpu_time(start)
+  open(unit=fu_output,status='unknown',file='output.dat')
 !----------------------------------------------------------------------
 !-- read settings and allocate memories                              --
 !----------------------------------------------------------------------
-  write(*,*) 'SETUP STARTED!'
+  write(fu_output,*) "=================================================="
+  write(fu_output,*) "SETUP STARTED!"
   call setup
 !----------------------------------------------------------------------
-!-- calculate the Green's function for plasma and fcoil              --
+!-- load initial psi by calculate psif from fcoil                    --
 !----------------------------------------------------------------------
-  write(*,*) 'CALCULATE GREEN TABLE STARTED!'
-  call calcgfunc
-  call writegfunc
-!----------------------------------------------------------------------
-!-- calculate psi by fcoils                                          --
-!----------------------------------------------------------------------
-  call calcpsif
+  write(fu_output,*) "=================================================="
+  write(fu_output,*) 'LOAD STARTED!'
+  call load
 !----------------------------------------------------------------------
 !-- main iteration loops                                             --
 !----------------------------------------------------------------------
-  write(*,*) 'MAIN ITERATION LOOP STARTED!'
+  write(fu_output,*) "=================================================="
+  write(fu_output,*) 'MAIN ITERATION LOOP STARTED!'
   it=0
   dpsi=10*tol
-  psip_rz=0.0d0
-  psi_rz(:,:)=psip_rz(:,:)+psif_rz(:,:)
   do while(it<nitermax .and. dpsi>tol)
     it=it+1
     write(*,*) "it = ",it
@@ -78,6 +74,7 @@ program main
   flush(fu_snap)
   close(fu_snap)
 
+  close(fu_output)
   stop
 end program main
 

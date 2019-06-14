@@ -19,7 +19,7 @@
 ! calling arguments:                                                   *
 !                                                                      *
 !***********************************************************************
-subroutine calcgfunc
+subroutine load
   use readin_params
   use global_params
   implicit none
@@ -58,15 +58,49 @@ subroutine calcgfunc
       gffcoil_rzf(:,:,i)=gftmp
     enddo
   endif
+!----------------------------------------------------------------------
+!-- calculate psi by fcoils                                          --
+!----------------------------------------------------------------------
+  call calcpsif
+!----------------------------------------------------------------------
+!-- load initial psi at grid points                                  --
+!----------------------------------------------------------------------
+  psip_rz=0.0d0
+  psi_rz(:,:)=psip_rz(:,:)+psif_rz(:,:)
  
   return
-end subroutine calcgfunc
+end subroutine load
+
+
+!***********************************************************************
+! subprogram description:                                              *
+!      calcpsif calculate the psi according to the ploidal field       *
+!      coil current J_f and it's Green's function.                     *
+!                                                                      *
+! calling arguments:                                                   *
+!                                                                      *
+!***********************************************************************
+subroutine calcpsif
+  use consta, only:mu0,pi
+  use readin_params,only:nfcoil,J_f
+  use global_params,only:psif_rz,gffcoil_rzf
+  implicit none
+  integer*4 :: i
+
+  psif_rz=0.0d0
+  do i=1,nfcoil
+    psif_rz(:,:)=psif_rz(:,:)+mu0/2.0d0/pi*J_f(i)*gffcoil_rzf(:,:,i)
+  enddo
+end subroutine calcpsif
 
 
 !***********************************************************************
 ! subprogram description:                                              *
 !      greenfunc computes the Green's functions at (r,z)               *
 !      due to coil with width and height.                              *
+!                                                                      *
+! calling arguments:                                                   *
+!                                                                      *
 !***********************************************************************
 subroutine greenfunc(rc,zc,wc,hc,acr,acz,nsr,nsz, &
     ngr,ngz,rgrid_rz,zgrid_rz,gfgrid_rz)
