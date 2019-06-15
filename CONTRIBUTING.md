@@ -15,16 +15,26 @@ Fortran 90 is the main developing language for this project.
 ### 1.1 隐式类型(implicit)
 在所有的子程序中都不要使用`implicit integer (i-n)`之类的隐式类型定义语句。相反，应该在所有子程序中都声明`implicit none`并且显示的定义每个变量的类型。
 
+Never use a data type declaration clause like `implicit integer (i-n)` in any subprograms. Instead, `implicit none` should be used at the start of each subprogram, and declare every variables explicitly.
+
 ### 1.2 模块(Module)
-尽可能的使用Fortran 90 提供的模块（module）功能，并用`use <modulename>,only:`指定module中哪些变量或派生类型定义可用于调用程序。module应该是一些相互联系的变量和子程序的组合。
+尽可能的使用Fortran 90 提供的模块（module）功能，并用`use <modulename>, only:`指定module中哪些变量或派生类型定义可用于调用程序。module应该是一些相互联系的变量和子程序的组合。
 
 不要使用Fortran的`include <filename>`语句，多数情况下应该代之以`use <modulename>`语句，其他少数情况可以用预处理语句`#include <filename>`语句代替。
 
+Use module of Fortran 90 as much as possible, and use `use <modulename>, only:` to declare explicitly which variables would be used in this subprogram. Module should be the combination of some relative variables and subprograms.
+
+Don't use the `include <filename>` clause offerred by Fortran, and alternatively in most situations, `use <modulename>` should be applied and use the preprocessing clause `#include <filename>` in other situations.
+
 ### 1.3 format语句(FORMAT clause)
-在用`read`或`write`读或写文件时，可能会用到format语句，这是唯一可以在代码中使用行号的情况。除此之外，都不要在语句中使用行号。所有的format语句都集中写在该子程序的末尾。但是，在此之前，你应该首先考虑使用`namelist`是否会更好一些。
+在读或写文件时，可能会用到format语句，这是唯一可以在代码中使用行号的情况。除此之外，都不要在语句中使用行号。所有的format语句都集中写在该子程序的末尾。但是，在此之前，你应该首先考虑使用`namelist`是否会更好一些。
+
+FORMAT clause may be used when reading from/writing to files, this should be the only situation that line number is allowed. Don't use any line number in your program beyond that. All the format clause should be collected at the end of that subprogram. However, you should think over a `namelist` may be better than it or not.
 
 ### 1.4 条件语句(IF & GOTO clause)
 永远不要在if语句中使用`go to`语句。如上所述，除了format语句之外，不应该有其他的带行号的语句，因此也无法使用go to语句。
+
+Never use `go to` clause in an if-else judgement. As stated above, no statement with line number except format clause is allowed. So, you can't use `go to` clause as well.
 
 ### 1.5 循环语句(DO/DO WHILE clause)
 不要使用旧式的 do/continue 循环，应该代之以新的 do/enddo 循环方式。
@@ -34,9 +44,9 @@ Don't use the old 'do/continue' cycling clause, you should replace them by 'do/e
 ```fortran
 Yes:
 do i=1,imax
-	do j=1,jmax
-		...
-	enddo
+    do j=1,jmax
+        ...
+    enddo
 enddo
 ```
 
@@ -52,11 +62,17 @@ No:
 ### 1.6 数据赋值语句(DATA clause)
 不要使用`data`语句对数据进行赋值，对变量的赋值可以在声明时进行或者在程序中完成。
 
+Don't use data clause to make assignment, which can be done at the declaration or in the subprogram.
+
 ### 1.7 COMMON公共块(COMMON BLOCK)
 不要使用`common block`在不同的子程序之间共享变量，相反，应该使用模块(module)实现这一功能。
 
+Don't use `common block` to share variables among subprograms, alternatively, `module` should be applied.
+
 ### 1.8 entry语句(ENTRY clause)
-不要使用`entry`语句，一个子程序应该只有一个入口点。应该用多个子程序代替entry的使用。
+永远不要使用`entry`语句，一个子程序应该只有一个入口点。应该用多个子程序代替entry的使用。
+
+Never use `entry` property. A subprogram should have only one entry. Define several subprograms to avoid entry clause.
 
 ## 2. Fortran 风格规范(Fotran Style Rules)
 ### 2.1 格式(layout format)
@@ -65,9 +81,9 @@ No:
 ### 2.1 文件名(File name)
 所有文件都应该以`.F90`或`.f90`为后缀，前者适用于需要预编译的情况，后者适用于不需要预编译的情况。
 
-All files should be suffixed with `.F90` or `.f90`, the former applies to situations where precompilation is required, while the latter applies not.
-
 主程序应该单独放置在一个文件中。除数据模块之外的其他模块应该单独放置在一个文件中，并以模块名命名文件名。
+
+All files should be suffixed with `.F90` or `.f90`, the former applies to situations where precompilation is required, while the latter applies not.
 
 The main program should be placed in a separate file. Modules, if they are not data module, should also be placed in a separate file and named after the 
 module name.
@@ -86,8 +102,6 @@ Do not terminate your lines with semicolons, and do not use semicolons to put tw
 不要滥用括号。
 
 Use parentheses sparingly.
-
-It is fine, though not required, to use parentheses around tuples. Do not use them in return statements or conditional statements unless using parentheses for implied line continuation or to indicate a tuple.
 
 ### 2.5 缩进(Indentation)
 
