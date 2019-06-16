@@ -18,8 +18,9 @@ module consta
   public
 
   real*8,parameter :: pi = 3.1415926535897932
-  !real*8,parameter :: tmu = 2.0d-07
   real*8,parameter :: mu0 = pi*4.0d-07
+  !> tmu=mu0/2.0d0/pi
+  real*8,parameter :: tmu = 2.0d-07
   real*8,parameter :: small = 1.0d-10
 end module consta
 
@@ -123,9 +124,9 @@ module global_params
   !> delta Z at grid points
   real*8,dimension(:,:),allocatable :: dz_rz
   !> Green's function for plasma itself
-  real*8,dimension(:,:,:,:),allocatable :: gfplas_rzrz
+  !real*8,dimension(:,:,:,:),allocatable :: gfplas_rzrz
   !> Green's function for p.f. coils
-  real*8,dimension(:,:,:),allocatable :: gffcoil_rzf
+  !real*8,dimension(:,:,:),allocatable :: gffcoil_rzf
   !> psi at grid points
   real*8,dimension(:,:),allocatable :: psi_rz
   !> psi induced by plasma itself at grid points

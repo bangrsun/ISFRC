@@ -20,7 +20,6 @@
 !                                                                      *
 !***********************************************************************
 program main
-  use consta,only:mu0,pi
   use readin_params,only:Izeta,nitermax,tol
   use global_params
   use nio
@@ -53,11 +52,10 @@ program main
   do while(it<nitermax .and. abs(Izeta-Jztot)>100)
   !do while(it<nitermax .and. dpsi>tol .and. abs(Izeta-Jztot)>100)
     it=it+1
-    !-- calculate Jzeta from psi---------------------------------------
+    !-- calculate pprim and Jzeta from fix ----------------------------
     call calcJzeta
-    !-- update psip from Jzeta ----------------------------------------
-    call calcpsip
-    psinew_rz(:,:)=psip_rz(:,:)+psif_rz(:,:)
+    !-- update psi from sor iteration ---------------------------------
+    call calcpsinew
     !-- calculate delta psi after update ------------------------------
     dpsi_rz(:,:)=psinew_rz(:,:)-psi_rz(:,:)
     dpsi=maxval(abs(dpsi_rz))
@@ -73,7 +71,7 @@ program main
   write(fu_snap,*) rgrid_rz
   write(fu_snap,*) zgrid_rz
   write(fu_snap,*) psi_rz
-  write(fu_snap,*) Jzeta_rz
+  write(fu_snap,*) pprim_rz
   flush(fu_snap)
   close(fu_snap)
 
