@@ -117,14 +117,18 @@ module global_params
   real*8,dimension(:,:),allocatable :: zgrid_rz
   !> psi at grid points
   real*8,dimension(:,:),allocatable :: psi_rz
-  !> psi induced by fcoil at grid points
-  real*8,dimension(:,:),allocatable :: psif_rz
-  !> new psi after every iteration
+  !> new psi after every SOR iteration
   real*8,dimension(:,:),allocatable :: psinew_rz
   !> delta psi between two successive iteration
   real*8,dimension(:,:),allocatable :: dpsi_rz
-  !> pressure at grid points
-  real*8,dimension(:,:),allocatable :: pres_rz
+  !> psi induced by fcoil at grid points
+  real*8,dimension(:,:),allocatable :: psif_rz
+  !> psi induced by plasma itself
+  real*8,dimension(:,:),allocatable :: psip_rz
+  !> new psip after every SOR iteration
+  real*8,dimension(:,:),allocatable :: psipnew_rz
+  !> delta psip between two successive SOR iteration
+  real*8,dimension(:,:),allocatable :: dpsip_rz
   !> dp/dpsi at grid points
   real*8,dimension(:,:),allocatable :: pprim_rz
   !> current density at grid points
