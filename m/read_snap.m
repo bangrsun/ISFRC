@@ -31,7 +31,13 @@ for j=1:ngz
     A.psi_zr(j,:)=fscanf(fid,'%f\n',ngr);
 end
 for j=1:ngz
-    A.Jzeta_zr(j,:)=fscanf(fid,'%f\n',ngr);
+    A.psif_zr(j,:)=fscanf(fid,'%f\n',ngr);
+end
+for j=1:ngz
+    A.psip_zr(j,:)=fscanf(fid,'%f\n',ngr);
+end
+for j=1:ngz
+    A.pprim_zr(j,:)=fscanf(fid,'%f\n',ngr);
 end
 
 end

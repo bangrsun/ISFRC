@@ -4,10 +4,10 @@ $simuset
  nfcoil=13
 
  ipres=2
- cn=0.4261,20,-0.0005
+ cn=0.0261,50,-0.0005
  Izeta=-4.0d5
- nitermax=050
- tol=1.0d-19
+ nitermax=010
+ tol=1.0d-8
 
 /
 $fcoilset

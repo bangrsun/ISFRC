@@ -68,16 +68,19 @@ subroutine setup
   ngr1=ngr+1
   ngz1=ngz+1
   allocate(rgrid_rz(ngr1,ngz1),zgrid_rz(ngr1,ngz1))
-  allocate(psi_rz(ngr1,ngz1),psif_rz(ngr1,ngz1))
-  allocate(psinew_rz(ngr1,ngz1),dpsi_rz(ngr1,ngz1))
-  allocate(pres_rz(ngr1,ngz1),pprim_rz(ngr1,ngz1),Jzeta_rz(ngr1,ngz1))
+  allocate(psif_rz(ngr1,ngz1))
+  allocate(psi_rz(ngr1,ngz1),psinew_rz(ngr1,ngz1),dpsi_rz(ngr1,ngz1))
+  allocate(psip_rz(ngr1,ngz1),psipnew_rz(ngr1,ngz1),dpsip_rz(ngr1,ngz1))
+  allocate(pprim_rz(ngr1,ngz1),Jzeta_rz(ngr1,ngz1))
   rgrid_rz=0.0d0
   zgrid_rz=0.0d0
-  psi_rz=0.0d0
   psif_rz=0.0d0
+  psi_rz=0.0d0
   psinew_rz=0.0d0
   dpsi_rz=0.0d0
-  pres_rz=0.0d0
+  psip_rz=0.0d0
+  psipnew_rz=0.0d0
+  dpsip_rz=0.0d0
   pprim_rz=0.0d0
   Jzeta_rz=0.0d0
 !----------------------------------------------------------------------

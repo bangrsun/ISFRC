@@ -72,15 +72,15 @@ end subroutine calcJzeta
 ! calling arguments:                                                   *
 !                                                                      *
 !***********************************************************************
-subroutine calcpsinew
+subroutine calcpsipnew
   use consta,only:mu0
   use readin_params,only:ngr,ngz
   use global_params,only:ngr1,ngz1,dr,dz,rgrid_rz &
-    ,pprim_rz,psinew_rz,psi_rz,psif_rz
+    ,pprim_rz,psip_rz,psipnew_rz
   implicit none
   integer*4 :: i,j
   real*8 :: w=0.8
-  real*8 :: r,cdiag,cr1,cr2,cz,dpsi
+  real*8 :: r,cdiag,cr1,cr2,cz
 
   do j=2,ngz
     do i=2,ngr
@@ -89,19 +89,18 @@ subroutine calcpsinew
       cr2=r/(dr*dr*(r-0.5d0*dr))
       cz=1.0d0/(dz*dz)
       cdiag=1.0d0/(cr1+cr2+2.0d0*cz)
-      dpsi=cdiag*( &
-                   cr1*psi_rz(i+1,j)+cr2*psi_rz(i-1,j) &
-                  +cz*(psi_rz(i,j+1)+psi_rz(i,j-1)) &
+      psipnew_rz(i,j)=(1-w)*psip_rz(i,j) &
+        +w*cdiag*( &
+                   cr1*psip_rz(i+1,j)+cr2*psip_rz(i-1,j) &
+                  +cz*(psip_rz(i,j+1)+psip_rz(i,j-1)) &
                   +mu0*r*r*pprim_rz(i,j) &
-                 ) &
-                 -psi_rz(i,j)
-      psinew_rz(i,j)=psi_rz(i,j)+w*dpsi
+                 )
     enddo
   enddo
-  psinew_rz(1,:)=0.0d0
-  psinew_rz(ngr1,:)=psif_rz(ngr1,:)
-  psinew_rz(:,1)=psif_rz(:,1)
-  psinew_rz(:,ngz1)=psif_rz(:,ngz1)
+  psipnew_rz(1,:)=0.0d0
+  psipnew_rz(ngr1,:)=0.0d0
+  !psipnew_rz(:,1)=0.0d0
+  !psipnew_rz(:,ngz1)=0.0d0
 
-end subroutine calcpsinew
+end subroutine calcpsipnew
 

@@ -16,14 +16,18 @@ figure('Unit','normalized',...
     'DefaultAxesFontWeight','normal',...
     'DefaultAxesLineWidth',3,...
     'DefaultAxesTickLength',[0.013,0.03]);
-subplot(2,1,1);
-surf(SNAP.zgrid_zr,SNAP.rgrid_zr,SNAP.psi_zr);
+subplot(3,1,1);
+surf(SNAP.zgrid_zr,SNAP.rgrid_zr,SNAP.psif_zr);
 shading interp; view([0,0,1]); colorbar;
 xlabel('$Z/Z_w$','Interpreter','latex');
 ylabel('$R/R_w$','Interpreter','latex');
-subplot(2,1,2);
-surf(SNAP.zgrid_zr,SNAP.rgrid_zr,SNAP.Jzeta_zr);
+subplot(3,1,2);
+surf(SNAP.zgrid_zr,SNAP.rgrid_zr,SNAP.psip_zr);
 shading interp; view([0,0,1]); colorbar;
 xlabel('$Z/Z_w$','Interpreter','latex');
 ylabel('$R/R_w$','Interpreter','latex');
-
+subplot(3,1,3);
+surf(SNAP.zgrid_zr,SNAP.rgrid_zr,SNAP.pprim_zr);
+shading interp; view([0,0,1]); colorbar;
+xlabel('$Z/Z_w$','Interpreter','latex');
+ylabel('$R/R_w$','Interpreter','latex');
