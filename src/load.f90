@@ -57,8 +57,7 @@ subroutine load
 !----------------------------------------------------------------------
 !-- load initial psi at grid points                                  --
 !----------------------------------------------------------------------
-  psip_rz=0.0d0
-  psi_rz(:,:)=psip_rz(:,:)+psif_rz(:,:)
+  psi_rz(:,:)=psif_rz(:,:)
  
   return
 end subroutine load

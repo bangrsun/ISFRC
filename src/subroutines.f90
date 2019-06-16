@@ -21,8 +21,8 @@
 subroutine calcJzeta
   use consta,only:mu0
   use readin_params,only:ngr,ngz,ipres,cn
-  use global_params,only:ngr1,ngz1,rgrid_rz,dr_rz,dz_rz, &
-    Jzeta_rz,pprim_rz,psi_rz,Jztot
+  use global_params,only:ngr1,ngz1,dr,dz,rgrid_rz &
+    ,Jzeta_rz,pprim_rz,psi_rz,Jztot
   implicit none
   integer*4 :: i,j
   real*8 :: xtmp,sechx
@@ -56,7 +56,7 @@ subroutine calcJzeta
   Jztot=0.0d0
   do j=2,ngz
     do i=2,ngr
-      Jztot=Jztot+Jzeta_rz(i,j)*dr_rz(i,j)*dz_rz(i,j)
+      Jztot=Jztot+Jzeta_rz(i,j)*dr*dz
     enddo
   enddo
   
@@ -75,18 +75,16 @@ end subroutine calcJzeta
 subroutine calcpsinew
   use consta,only:mu0
   use readin_params,only:ngr,ngz
-  use global_params,only:ngr1,ngz1,rgrid_rz,dr_rz,dz_rz &
+  use global_params,only:ngr1,ngz1,dr,dz,rgrid_rz &
     ,pprim_rz,psinew_rz,psi_rz,psif_rz
   implicit none
   integer*4 :: i,j
   real*8 :: w=0.8
-  real*8 :: r,dr,dz,cdiag,cr1,cr2,cz,dpsi
+  real*8 :: r,cdiag,cr1,cr2,cz,dpsi
 
   do j=2,ngz
     do i=2,ngr
       r=rgrid_rz(i,j)
-      dr=dr_rz(i,j)
-      dz=dz_rz(i,j)
       cr1=r/(dr*dr*(r+0.5d0*dr))
       cr2=r/(dr*dr*(r-0.5d0*dr))
       cz=1.0d0/(dz*dz)

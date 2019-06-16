@@ -1,5 +1,4 @@
 $simuset
- igrid=0,
  ngr=32, ngz=64
  rmin=0.0, rmax=1.0, zmin=-1.0, zmax=1.0
  nfcoil=13
