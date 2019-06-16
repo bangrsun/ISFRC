@@ -1,13 +1,12 @@
 $simuset
- igrid=0,
  ngr=32, ngz=64
  rmin=0.0, rmax=1.0, zmin=-1.0, zmax=1.0
  nfcoil=13
 
  ipres=2
- cn=0.0091,500,-0.0005
+ cn=0.4261,20,-0.0005
  Izeta=-4.0d5
- nitermax=100
+ nitermax=050
  tol=1.0d-19
 
 /

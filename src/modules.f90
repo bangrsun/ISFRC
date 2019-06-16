@@ -18,8 +18,9 @@ module consta
   public
 
   real*8,parameter :: pi = 3.1415926535897932
-  !real*8,parameter :: tmu = 2.0d-07
   real*8,parameter :: mu0 = pi*4.0d-07
+  !> tmu=mu0/2.0d0/pi
+  real*8,parameter :: tmu = 2.0d-07
   real*8,parameter :: small = 1.0d-10
 end module consta
 
@@ -52,14 +53,9 @@ module readin_params
   implicit none
   public
 
-  !> flag for define grids, =0 uniform, =1 customed
-  integer*4 :: igrid
-  !> number of grids in R direction, without outer boundary
-  integer*4 :: ngr
-  !> number of grids in Z direction, without outer boundary
-  integer*4 :: ngz
+  !> number of grids in R & Z direction, without outer boundary
+  integer*4 :: ngr,ngz
   !> border of calculation box, 
-  !  must be defined if igrid=0, no meaning if igrid=1
   real*8 :: rmin,rmax,zmin,zmax
   !> number of p.f. coils, <=0 disabled, >0 enabled
   integer*4 :: nfcoil
@@ -94,7 +90,7 @@ module readin_params
   !> output tolerance for delta psi
   real*8 :: tol
 
-  namelist/simuset/ igrid,ngr,ngz,rmin,rmax,zmin,zmax &
+  namelist/simuset/ ngr,ngz,rmin,rmax,zmin,zmax &
     ,nfcoil &
     ,ipres,Izeta,cn,nitermax,tol
 
@@ -110,26 +106,17 @@ module global_params
   implicit none
   public
 
-  !> number of grids in R direction, with outer boundary, ngr1=ngr+1
-  integer*4 :: ngr1
-  !> number of grids in Z direction, with outer boundary, ngz1=ngz+1
-  integer*4 :: ngz1
-  !> R coordinate of grid points, must be defined if igrid=1
+  !> number of grids in R & Z direction, with outer boundary,
+  ! ngr1=ngr+1, ngz1=ngz+1
+  integer*4 :: ngr1,ngz1
+  !> delta r & delta z
+  real*8 :: dr,dz
+  !> R coordinate of grid points
   real*8,dimension(:,:),allocatable :: rgrid_rz
-  !> Z coordinate of grid points, must be defined if igrid=1
+  !> Z coordinate of grid points
   real*8,dimension(:,:),allocatable :: zgrid_rz
-  !> delta R at grid points
-  real*8,dimension(:,:),allocatable :: dr_rz
-  !> delta Z at grid points
-  real*8,dimension(:,:),allocatable :: dz_rz
-  !> Green's function for plasma itself
-  real*8,dimension(:,:,:,:),allocatable :: gfplas_rzrz
-  !> Green's function for p.f. coils
-  real*8,dimension(:,:,:),allocatable :: gffcoil_rzf
   !> psi at grid points
   real*8,dimension(:,:),allocatable :: psi_rz
-  !> psi induced by plasma itself at grid points
-  real*8,dimension(:,:),allocatable :: psip_rz
   !> psi induced by fcoil at grid points
   real*8,dimension(:,:),allocatable :: psif_rz
   !> new psi after every iteration
