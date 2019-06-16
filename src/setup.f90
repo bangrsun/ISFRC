@@ -24,7 +24,6 @@ subroutine setup
   implicit none
   logical file_exist
   integer i,j
-  real*8 dr,dz
 
 !----------------------------------------------------------------------
 !-- read experimental settings                                       --
@@ -69,20 +68,12 @@ subroutine setup
   ngr1=ngr+1
   ngz1=ngz+1
   allocate(rgrid_rz(ngr1,ngz1),zgrid_rz(ngr1,ngz1))
-  allocate(dr_rz(ngr,ngz),dz_rz(ngr,ngz))
-  allocate(gffcoil_rzf(ngr1,ngz1,nfcoil))
-  allocate(gfplas_rzrz(ngr1,ngz1,ngr1,ngz1))
-  allocate(psi_rz(ngr1,ngz1),psip_rz(ngr1,ngz1),psif_rz(ngr1,ngz1))
+  allocate(psi_rz(ngr1,ngz1),psif_rz(ngr1,ngz1))
   allocate(psinew_rz(ngr1,ngz1),dpsi_rz(ngr1,ngz1))
-  allocate(pres_rz(ngr1,ngz1),pprim_rz(ngr,ngz),Jzeta_rz(ngr1,ngz1))
+  allocate(pres_rz(ngr1,ngz1),pprim_rz(ngr1,ngz1),Jzeta_rz(ngr1,ngz1))
   rgrid_rz=0.0d0
   zgrid_rz=0.0d0
-  dr_rz=0.0d0
-  dz_rz=0.0d0
-  gfplas_rzrz=0.0d0
-  gffcoil_rzf=0.0d0
   psi_rz=0.0d0
-  psip_rz=0.0d0
   psif_rz=0.0d0
   psinew_rz=0.0d0
   dpsi_rz=0.0d0
@@ -90,40 +81,20 @@ subroutine setup
   pprim_rz=0.0d0
   Jzeta_rz=0.0d0
 !----------------------------------------------------------------------
-!-- read grid parameters or make grid meshes                         --
+!-- make grid meshes                                                 --
 !----------------------------------------------------------------------
-  if(igrid == 0) then
-    dr=(rmax-rmin)/float(ngr)
-    dz=(zmax-zmin)/float(ngz)
-    dr_rz=dr
-    dz_rz=dz
-    do j=1,ngz1
-      do i=1,ngr1
-        rgrid_rz(i,j)=rmin+(i-1)*dr
-        zgrid_rz(i,j)=zmin+(j-1)*dz
-      enddo
+  dr=(rmax-rmin)/float(ngr)
+  dz=(zmax-zmin)/float(ngz)
+  do j=1,ngz1
+    do i=1,ngr1
+      rgrid_rz(i,j)=rmin+(i-1)*dr
+      zgrid_rz(i,j)=zmin+(j-1)*dz
     enddo
-    open(unit=fu_grid,status='unknown',file='grid.dat')
-    write(fu_grid,*) ((rgrid_rz(i,j), i=1,ngr1), j=1,ngz1)
-    write(fu_grid,*) ((zgrid_rz(i,j), i=1,ngr1), j=1,ngz1)
-    close(fu_grid)
-  elseif(igrid == 1) then
-    inquire(file='grid.dat',exist=file_exist)
-    if(.not. file_exist) then
-      write(*,*) 'Cannot find file grid.dat !!!'
-      stop
-    endif
-    open(unit=fu_grid,status='old',file='grid.dat')
-    read(fu_grid,*) ((rgrid_rz(i,j), i=1,ngr1), j=1,ngz1)
-    read(fu_grid,*) ((zgrid_rz(i,j), i=1,ngr1), j=1,ngz1)
-    do j=1,ngz
-      do i=1,ngr
-        dr_rz(i,j)=rgrid_rz(i,j+1)-rgrid_rz(i,j)
-        dz_rz(i,j)=zgrid_rz(i,j+1)-zgrid_rz(i,j)
-      enddo
-    enddo
-    close(fu_grid)
-  endif
+  enddo
+  open(unit=fu_grid,status='unknown',file='grid.dat')
+  write(fu_grid,*) ((rgrid_rz(i,j), i=1,ngr1), j=1,ngz1)
+  write(fu_grid,*) ((zgrid_rz(i,j), i=1,ngr1), j=1,ngz1)
+  close(fu_grid)
 
   return
 end subroutine setup
