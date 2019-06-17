@@ -34,8 +34,8 @@ module nio
 
   !> expset namelist are defined in this file
   integer*4,parameter :: fu_input = 100
-  !> rgrid & zgrid are defined in this file
-  integer*4,parameter :: fu_grid = 101
+  !> initial equilibrium are defined in this file
+  integer*4,parameter :: fu_equ = 101
   !> expset namelist are outputed in this file
   integer*4,parameter :: fu_output = 200
   !> green functions are outputed in this file
@@ -82,17 +82,21 @@ module readin_params
   real*8,dimension(:),allocatable :: J_f
 
 
+  !> type of equilibrium, =0 calculated, =1 inputted
+  integer*4 :: iequ
+  !> type of pressure profile
   integer*4 :: ipres
   real*8 :: Izeta
+  !> coefficients for fixing pressure profile
   real*8,dimension(3) :: cn
-  !> maximum iteration steps
-  integer*4 :: nitermax
   !> output tolerance for delta psi
   real*8 :: tol
+  !> maximum time steps
+  integer*4 :: nt
 
   namelist/simuset/ ngr,ngz,rmin,rmax,zmin,zmax &
     ,nfcoil &
-    ,ipres,Izeta,cn,nitermax,tol
+    ,iequ,ipres,Izeta,cn,tol,nt
 
   namelist/fcoilset/ r_f,z_f,w_f,h_f,ar_f,az_f,nsr_f,nsz_f,J_f
 
@@ -115,16 +119,20 @@ module global_params
   real*8,dimension(:,:),allocatable :: rgrid_rz
   !> Z coordinate of grid points
   real*8,dimension(:,:),allocatable :: zgrid_rz
-  !> psi at grid points
-  real*8,dimension(:,:),allocatable :: psi_rz
   !> psi induced by fcoil at grid points
   real*8,dimension(:,:),allocatable :: psif_rz
-  !> new psi after every iteration
+  !> psi at grid points
+  real*8,dimension(:,:),allocatable :: psi_rz
+  !> new psi after every SOR iteration
   real*8,dimension(:,:),allocatable :: psinew_rz
   !> delta psi between two successive iteration
   real*8,dimension(:,:),allocatable :: dpsi_rz
-  !> pressure at grid points
-  real*8,dimension(:,:),allocatable :: pres_rz
+  !> psi induced by plasma itself
+  real*8,dimension(:,:),allocatable :: psip_rz
+  !> new psip after every SOR iteration
+  real*8,dimension(:,:),allocatable :: psipnew_rz
+  !> delta psip between two successive SOR iteration
+  real*8,dimension(:,:),allocatable :: dpsip_rz
   !> dp/dpsi at grid points
   real*8,dimension(:,:),allocatable :: pprim_rz
   !> current density at grid points

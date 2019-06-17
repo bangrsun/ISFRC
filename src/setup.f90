@@ -23,7 +23,6 @@ subroutine setup
   use global_params
   implicit none
   logical file_exist
-  integer i,j
 
 !----------------------------------------------------------------------
 !-- read experimental settings                                       --
@@ -68,33 +67,21 @@ subroutine setup
   ngr1=ngr+1
   ngz1=ngz+1
   allocate(rgrid_rz(ngr1,ngz1),zgrid_rz(ngr1,ngz1))
-  allocate(psi_rz(ngr1,ngz1),psif_rz(ngr1,ngz1))
-  allocate(psinew_rz(ngr1,ngz1),dpsi_rz(ngr1,ngz1))
-  allocate(pres_rz(ngr1,ngz1),pprim_rz(ngr1,ngz1),Jzeta_rz(ngr1,ngz1))
+  allocate(psif_rz(ngr1,ngz1))
+  allocate(psi_rz(ngr1,ngz1),psinew_rz(ngr1,ngz1),dpsi_rz(ngr1,ngz1))
+  allocate(psip_rz(ngr1,ngz1),psipnew_rz(ngr1,ngz1),dpsip_rz(ngr1,ngz1))
+  allocate(pprim_rz(ngr1,ngz1),Jzeta_rz(ngr1,ngz1))
   rgrid_rz=0.0d0
   zgrid_rz=0.0d0
-  psi_rz=0.0d0
   psif_rz=0.0d0
+  psi_rz=0.0d0
   psinew_rz=0.0d0
   dpsi_rz=0.0d0
-  pres_rz=0.0d0
+  psip_rz=0.0d0
+  psipnew_rz=0.0d0
+  dpsip_rz=0.0d0
   pprim_rz=0.0d0
   Jzeta_rz=0.0d0
-!----------------------------------------------------------------------
-!-- make grid meshes                                                 --
-!----------------------------------------------------------------------
-  dr=(rmax-rmin)/float(ngr)
-  dz=(zmax-zmin)/float(ngz)
-  do j=1,ngz1
-    do i=1,ngr1
-      rgrid_rz(i,j)=rmin+(i-1)*dr
-      zgrid_rz(i,j)=zmin+(j-1)*dz
-    enddo
-  enddo
-  open(unit=fu_grid,status='unknown',file='grid.dat')
-  write(fu_grid,*) ((rgrid_rz(i,j), i=1,ngr1), j=1,ngz1)
-  write(fu_grid,*) ((zgrid_rz(i,j), i=1,ngr1), j=1,ngz1)
-  close(fu_grid)
 
   return
 end subroutine setup
