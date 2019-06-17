@@ -23,7 +23,6 @@ subroutine setup
   use global_params
   implicit none
   logical file_exist
-  integer i,j
 
 !----------------------------------------------------------------------
 !-- read experimental settings                                       --
@@ -83,21 +82,6 @@ subroutine setup
   dpsip_rz=0.0d0
   pprim_rz=0.0d0
   Jzeta_rz=0.0d0
-!----------------------------------------------------------------------
-!-- make grid meshes                                                 --
-!----------------------------------------------------------------------
-  dr=(rmax-rmin)/float(ngr)
-  dz=(zmax-zmin)/float(ngz)
-  do j=1,ngz1
-    do i=1,ngr1
-      rgrid_rz(i,j)=rmin+(i-1)*dr
-      zgrid_rz(i,j)=zmin+(j-1)*dz
-    enddo
-  enddo
-  open(unit=fu_grid,status='unknown',file='grid.dat')
-  write(fu_grid,*) ((rgrid_rz(i,j), i=1,ngr1), j=1,ngz1)
-  write(fu_grid,*) ((zgrid_rz(i,j), i=1,ngr1), j=1,ngz1)
-  close(fu_grid)
 
   return
 end subroutine setup
